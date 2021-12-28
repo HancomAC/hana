@@ -3,11 +3,11 @@ import type {Problem} from "./types/problem";
 import {WebSocketResponseType} from "./types/response";
 
 
-const waitList = [] as string[]
+const waitList = [] as string[], judgeList = [] as string[]
 const problemMap = new Map<string, Problem>()
 
-function judgeFinishHandler() {
-    const problem = waitList.shift()
+function judgeFinishHandler(problem: string) {
+    if (judgeList.indexOf(problem) !== -1) judgeList.splice(judgeList.indexOf(problem), 1)
     if (problem) {
         sendMessage(WebSocketResponseType.JUDGE_FINISH, {
             uid: (problemMap.get(problem) as Problem).uid,
@@ -15,10 +15,11 @@ function judgeFinishHandler() {
             reason: 'AC'
         })
     }
-    if (waitList.length > 0) judge(waitList[0])
+    while (judgeList.length < 3 && waitList.length) judge(waitList.shift() as string)
 }
 
 function judge(problem: string) {
+    judgeList.push(problem)
     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
         uid: (problemMap.get(problem) as Problem).uid,
         progress: 0,
@@ -35,7 +36,7 @@ function judge(problem: string) {
         }, i * rt + 1000)
     }
     setTimeout(() => {
-        judgeFinishHandler()
+        judgeFinishHandler(problem)
     }, rt * 10 + 1000)
 }
 
@@ -47,7 +48,7 @@ export function requestJudge(problem: Problem) {
         progress: 0,
         reason: 'PD'
     })
-    if (waitList.length === 1) judge(problem.uid)
+    while (judgeList.length < 3 && waitList.length) judge(waitList.shift() as string)
 }
 
 export function getJudgeInfo() {
