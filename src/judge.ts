@@ -18,14 +18,26 @@ function judgeFinishHandler() {
 }
 
 function judge(problem: Problem) {
+    for (let i = 1; i < 100; i++) {
+        setTimeout(() => {
+            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                uid: problem.uid,
+                progress: i / 100
+            })
+        }, i * 50)
+    }
     setTimeout(() => {
         judgeFinishHandler()
-    }, 1000)
+    }, 5000)
 }
 
 export function requestJudge(problem: Problem) {
     if (waitList.length === 0) judge(problem)
     waitList.push(problem)
+    sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+        uid: problem.uid,
+        progress: 0
+    })
 }
 
 export function getJudgeInfo() {

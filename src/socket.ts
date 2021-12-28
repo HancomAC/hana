@@ -28,7 +28,8 @@ export function sendError(reason: string) {
 export function init(app: expressWs.Application) {
     app.ws('/', (ws, req) => {
         if (wsObject) {
-            ws.close()
+            wsObject.close()
+            wsObject = ws
             return
         }
         wsObject = ws
