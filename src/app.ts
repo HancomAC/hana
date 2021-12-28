@@ -1,22 +1,47 @@
-import express from 'express';
-import {Server} from 'socket.io'
+import express from "express";
+import expressWs from "express-ws";
+import {WebSocket} from 'ws'
+import {v4 as uuid} from "uuid";
 
-const app = express();
-const io = new Server({})
+interface Problem {
+    uid: string
+}
 
-app.get('/', (req, res) => {
-    res.send('hi')
-})
+const app = expressWs(express()).app;
+const waitList = [] as Problem[]
+let wsObject = null as WebSocket | null
 
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    io.emit('stats', {numClients: 1});
-    socket.on('message', (message) => {
-        console.log(message)
-    })
-})
+app.get('/judge', (req, res) => {
+    const problem = {
+        uid: uuid()
+    }
+    waitList.push(problem)
+    setTimeout(() => {
+        if (wsObject) {
+            wsObject.send(JSON.stringify(problem))
+        }
+    }, 1000)
+    res.send(problem.uid);
+});
 
-app.listen(80, () => {
-    console.log('listening on port 80')
-})
-io.listen(3000)
+app.get('/', function (req, res, next) {
+    res.send('HANA v1.0');
+});
+
+app.ws('/', (ws, req) => {
+    if (wsObject) {
+        ws.close()
+        return
+    }
+    wsObject = ws
+    ws.on('message', function (msg) {
+        ws.send(JSON.stringify({a: 1, b: 2}));
+        ws.on('disconnect', function () {
+            wsObject = null
+            console.log('disconnect');
+        });
+        console.log(msg);
+    });
+});
+
+app.listen(80);
