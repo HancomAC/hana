@@ -1,15 +1,16 @@
-import express from "express";
-import expressWs from "express-ws";
-import {WebSocket} from 'ws'
-import {v4 as uuid} from "uuid";
+import express from "express"
+import expressWs from "express-ws"
+import {v4 as uuid} from "uuid"
+import {sendMessage, init} from "./socket";
 
 interface Problem {
     uid: string
 }
 
-const app = expressWs(express()).app;
 const waitList = [] as Problem[]
-let wsObject = null as WebSocket | null
+
+const app = expressWs(express()).app;
+init(app);
 
 app.get('/judge', (req, res) => {
     const problem = {
@@ -17,31 +18,13 @@ app.get('/judge', (req, res) => {
     }
     waitList.push(problem)
     setTimeout(() => {
-        if (wsObject) {
-            wsObject.send(JSON.stringify(problem))
-        }
+        sendMessage(JSON.stringify(problem))
     }, 1000)
     res.send(problem.uid);
 });
 
-app.get('/', function (req, res, next) {
+app.get('/', function (req, res) {
     res.send('HANA v1.0');
-});
-
-app.ws('/', (ws, req) => {
-    if (wsObject) {
-        ws.close()
-        return
-    }
-    wsObject = ws
-    ws.on('message', function (msg) {
-        ws.send(JSON.stringify({a: 1, b: 2}));
-        ws.on('disconnect', function () {
-            wsObject = null
-            console.log('disconnect');
-        });
-        console.log(msg);
-    });
 });
 
 app.listen(80);
