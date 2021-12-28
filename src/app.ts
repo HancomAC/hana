@@ -2,12 +2,9 @@ import express from "express"
 import expressWs from "express-ws"
 import {v4 as uuid} from "uuid"
 import {sendMessage, init} from "./socket";
+import {requestJudge} from "./judge";
+import {Problem} from "./types/problem";
 
-interface Problem {
-    uid: string
-}
-
-const waitList = [] as Problem[]
 
 const app = expressWs(express()).app;
 init(app);
@@ -15,11 +12,8 @@ init(app);
 app.get('/judge', (req, res) => {
     const problem = {
         uid: uuid()
-    }
-    waitList.push(problem)
-    setTimeout(() => {
-        sendMessage(JSON.stringify(problem))
-    }, 1000)
+    } as Problem;
+    requestJudge(problem);
     res.send(problem.uid);
 });
 

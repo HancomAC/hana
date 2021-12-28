@@ -4,9 +4,9 @@ import expressWs from "express-ws";
 
 let wsObject = null as WebSocket | null
 
-export function sendMessage(message: string) {
+export function sendMessage(message: any) {
     if (wsObject) {
-        wsObject.send(message)
+        wsObject.send(JSON.stringify(message));
     }
 }
 
@@ -18,7 +18,7 @@ export function init(app: expressWs.Application) {
         }
         wsObject = ws
         ws.on('message', function (msg) {
-            ws.send(JSON.stringify({a: 1, b: 2}));
+
             ws.on('disconnect', function () {
                 wsObject = null
             });
