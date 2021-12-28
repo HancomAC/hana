@@ -7,13 +7,10 @@ const waitList = [] as Problem[]
 function judgeFinishHandler() {
     const problem = waitList.shift()
     if (problem) {
-        sendMessage({
-            type: "judgeFinish",
-            data: {
-                uid: problem.uid,
-                score: 100,
-                reason: 'AC'
-            }
+        sendMessage(true, 'JUDGE_FINISH', {
+            uid: problem.uid,
+            score: 100,
+            reason: 'AC'
         })
     }
     if (waitList.length > 0) judge(waitList[0])
