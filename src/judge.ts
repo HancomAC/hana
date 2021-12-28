@@ -1,5 +1,6 @@
 import {sendMessage} from "./socket";
 import type {Problem} from "./types/problem";
+import {WebSocketResponseType} from "./types/response";
 
 
 const waitList = [] as Problem[]
@@ -7,7 +8,7 @@ const waitList = [] as Problem[]
 function judgeFinishHandler() {
     const problem = waitList.shift()
     if (problem) {
-        sendMessage(true, 'JUDGE_FINISH', {
+        sendMessage(WebSocketResponseType.JUDGE_FINISH, {
             uid: problem.uid,
             score: 100,
             reason: 'AC'
