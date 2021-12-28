@@ -27,12 +27,9 @@ export function sendError(reason: string) {
 
 export function init(app: expressWs.Application) {
     app.ws('/', (ws, req) => {
-        if (wsObject) {
-            wsObject.close()
-            wsObject = ws
-            return
-        }
+        if (wsObject) wsObject.close()
         wsObject = ws
+        sendMessage(WebSocketResponseType.JUDGE_STATUS, getJudgeInfo())
         ws.on('message', function (msg) {
             try {
                 const message = JSON.parse(msg.toString()) as WebSocketRequest
@@ -47,7 +44,7 @@ export function init(app: expressWs.Application) {
                         })
                         break
                     case WebSocketRequestType.JUDGE_STATUS:
-                        sendMessage(WebSocketResponseType.JUDGE_INFO, getJudgeInfo())
+                        sendMessage(WebSocketResponseType.JUDGE_STATUS, getJudgeInfo())
                         break
                     default:
                         sendError('Invalid message')

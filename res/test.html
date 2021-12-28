@@ -89,17 +89,35 @@
     let judgeNo = 1;
     const ws = new WebSocket('ws://localhost');
     const mdcProgress = {}
+    const reasonString = {
+        'PD': 'Pending',
+        'AC': 'Accepted',
+        'WA': 'Wrong Answer',
+        'TLE': 'Time Limit Exceeded',
+        'MLE': 'Memory Limit Exceeded',
+        'OLE': 'Output Limit Exceeded',
+        'RE': 'Runtime Error',
+        'CE': 'Compile Error',
+        'CP': 'Compiling',
+        'RUN': 'Running',
+    }
+
     ws.onmessage = function (event) {
         const res = JSON.parse(event.data);
-        console.log(res)
-        if (res.type === 'JUDGE_FINISH') setCard(res.data.uid, 1)
-        if (res.type === 'JUDGE_PROGRESS') setCard(res.data.uid, res.data.progress)
+        if (res.type === 'JUDGE_FINISH') setCard(res.data.uid, 1, res.data.reason)
+        if (res.type === 'JUDGE_PROGRESS') setCard(res.data.uid, res.data.progress, res.data.reason)
+        if (res.type === 'JUDGE_STATUS') {
+            for (let i of res.data.waitList) {
+                setCard(i, 0, 'PD')
+            }
+        }
     };
 
-    function setCard(id, progress) {
+    function setCard(id, progress, reason = '') {
         let card = document.getElementById(`card-${id}`);
         if (!card) card = addCard(id);
         if (progress === 1) card.classList.add('success')
+        document.getElementById(`subtitle-${id}`).innerText = reasonString[reason]
         setTimeout(() => {
             mdcProgress[id].foundation.setProgress(progress);
         }, 100);
@@ -124,6 +142,7 @@
           </div>`
         title.innerText = `#${judgeNo++}`;
         subTitle.innerText = id;
+        subTitle.id = `subtitle-${id}`;
         card.id = `card-${id}`;
         card.append(title);
         card.append(subTitle);
@@ -132,7 +151,6 @@
         document.querySelector('.container').prepend(card)
         const linearProgress = new mdc.linearProgress.MDCLinearProgress(document.getElementById(`progress-${id}`));
         mdcProgress[id] = linearProgress;
-        console.log(id)
         return card;
     }
 
