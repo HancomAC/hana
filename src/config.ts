@@ -1,3 +1,1 @@
-export default {
-    MultiJudgeCount: 2
-}
+export const MultiJudgeCount = 2

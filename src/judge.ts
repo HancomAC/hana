@@ -1,6 +1,7 @@
 import {sendMessage} from "./socket";
 import type {Problem} from "./types/problem";
 import {WebSocketResponseType} from "./types/response";
+import {MultiJudgeCount} from "./config";
 
 
 const waitList = [] as string[], judgeList = [] as string[]
@@ -15,7 +16,7 @@ function judgeFinishHandler(problem: string) {
             reason: 'AC'
         })
     }
-    while (judgeList.length < 3 && waitList.length) judge(waitList.shift() as string)
+    while (judgeList.length < MultiJudgeCount && waitList.length) judge(waitList.shift() as string)
 }
 
 function judge(problem: string) {
@@ -48,7 +49,7 @@ export function requestJudge(problem: Problem) {
         progress: 0,
         reason: 'PD'
     })
-    while (judgeList.length < 3 && waitList.length) judge(waitList.shift() as string)
+    while (judgeList.length < MultiJudgeCount && waitList.length) judge(waitList.shift() as string)
 }
 
 export function getJudgeInfo() {
