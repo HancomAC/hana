@@ -9,8 +9,12 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "yarn run build:ts && yarn run build:docker",
+    "build:ts": "tsc",
+    "build:docker": "docker build -t jungol:HANA -- ./",
     "run": "node --es-module-specifier-resolution=node dist/index.js",
+    "run:local": "yarn run build:ts && yarn run run",
+    "run:docker": "yarn run build && docker run -p 80:80 -it jungol:HANA",
     "dev": "tsc-watch --onSuccess \"node --es-module-specifier-resolution=node dist/index.js\""
   },
   "devDependencies": {

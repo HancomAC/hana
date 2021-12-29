@@ -16,7 +16,7 @@ app.get('/judge', (req, res) => {
         uid: uuid()
     } as Problem;
     requestJudge(problem);
-    res.send(problem.uid);
+    res.send({success: true, uid: problem.uid});
 });
 
 app.get('/test', function (req, res) {
