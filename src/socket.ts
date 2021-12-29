@@ -7,16 +7,28 @@ import { getJudgeInfo } from './judge'
 let wsObject = null as WebSocket | null
 let messageList = [] as string[]
 
-export function sendMessage(type: WebSocketResponseType, data?: any) {
+export function sendWS(message: string) {
     if (wsObject) {
-        wsObject.send(
-            JSON.stringify({
-                success: true,
-                type,
-                data,
-            } as WebSocketResponse)
-        )
-    }
+        wsObject.send(message, (e) => {
+            console.log(e)
+            if (e) {
+                if (wsObject) {
+                    wsObject.close()
+                    wsObject = null
+                }
+                messageList.push(message)
+            }
+        })
+    } else messageList.push(message)
+}
+
+export function sendMessage(type: WebSocketResponseType, data?: any) {
+    const message = JSON.stringify({
+        success: true,
+        type,
+        data,
+    } as WebSocketResponse)
+    sendWS(message)
 }
 
 export function sendError(reason: string) {
@@ -24,15 +36,7 @@ export function sendError(reason: string) {
         success: false,
         error: reason,
     } as WebSocketResponse)
-    if (wsObject) {
-        wsObject.send(message, () => {
-            if (wsObject) {
-                wsObject.close()
-                wsObject = null
-            }
-            messageList.push(message)
-        })
-    } else messageList.push(message)
+    sendWS(message)
 }
 
 export function init(app: expressWs.Application) {

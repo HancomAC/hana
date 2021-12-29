@@ -88,12 +88,17 @@
                 height: calc(100% - 20px);
                 margin-top: 10px;
             }
+
+            #connection-error {
+                background: #ffebef;
+                margin: 10px 0;
+            }
         </style>
     </head>
     <body>
         <script>
             let judgeNo = 1
-            const ws = new WebSocket('ws://localhost')
+            let ws
             const mdcProgress = {}
             const reasonString = {
                 PD: 'Pending',
@@ -108,18 +113,47 @@
                 RUN: 'Running',
             }
 
-            ws.onmessage = function (event) {
-                const res = JSON.parse(event.data)
-                if (res.type === 'JUDGE_FINISH')
-                    setCard(res.data.uid, 1, res.data.reason)
-                if (res.type === 'JUDGE_PROGRESS')
-                    setCard(res.data.uid, res.data.progress, res.data.reason)
-                if (res.type === 'JUDGE_STATUS') {
-                    for (let i of res.data.waitList) {
-                        setCard(i, 0, 'PD')
+            function connectWs() {
+                try {
+                    tws = new WebSocket('ws://' + window.location.host)
+                } catch (e) {
+                    tws = null
+                    return
+                }
+                tws.onopen = () => {
+                    ws = tws
+                }
+                tws.onmessage = function (event) {
+                    const res = JSON.parse(event.data)
+                    if (res.type === 'JUDGE_FINISH')
+                        setCard(res.data.uid, 1, res.data.reason)
+                    if (res.type === 'JUDGE_PROGRESS')
+                        setCard(
+                            res.data.uid,
+                            res.data.progress,
+                            res.data.reason
+                        )
+                    if (res.type === 'JUDGE_STATUS') {
+                        for (let i of res.data.waitList) {
+                            setCard(i, 0, 'PD')
+                        }
                     }
                 }
+                tws.addEventListener('close', () => {
+                    ws = null
+                })
             }
+
+            setInterval(() => {
+                if (!ws) {
+                    connectWs()
+                    document.getElementById('connection-error').style.display =
+                        ''
+                } else {
+                    document.getElementById('connection-error').style.display =
+                        'none'
+                }
+            }, 100)
 
             function setCard(id, progress, reason = '') {
                 let card = document.getElementById(`card-${id}`)
@@ -140,15 +174,15 @@
                 progress.className = 'mdc-linear-progress'
                 progress.id = `progress-${id}`
                 progress.innerHTML = `<div class="mdc-linear-progress__buffer">
-            <div class="mdc-linear-progress__buffer-bar"></div>
-            <div class="mdc-linear-progress__buffer-dots"></div>
-          </div>
-          <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
-            <span class="mdc-linear-progress__bar-inner"></span>
-          </div>
-          <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
-            <span class="mdc-linear-progress__bar-inner"></span>
-          </div>`
+              <div class="mdc-linear-progress__buffer-bar"></div>
+              <div class="mdc-linear-progress__buffer-dots"></div>
+            </div>
+            <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+              <span class="mdc-linear-progress__bar-inner"></span>
+            </div>
+            <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
+              <span class="mdc-linear-progress__bar-inner"></span>
+            </div>`
                 title.innerText = `#${judgeNo++}`
                 subTitle.innerText = id
                 subTitle.id = `subtitle-${id}`
@@ -166,7 +200,7 @@
             }
 
             function test() {
-                fetch('//localhost/judge')
+                fetch(`//${window.location.host}/judge`)
             }
         </script>
         <header class="mdc-top-app-bar">
@@ -194,6 +228,13 @@
                     <span class="mdc-button__ripple"></span>
                     Request Test Judgement
                 </button>
+                <div
+                    class="mdc-card mdc-card--outlined card"
+                    id="connection-error"
+                >
+                    <h3>Connection lost.</h3>
+                    <p>Trying to reconnect...</p>
+                </div>
             </div>
             <div class="container"></div>
         </main>
