@@ -8,6 +8,11 @@ export interface WebSocketRequest {
     data?: any
 }
 
+export const enum JudgeType {
+    CommonJudge = 'CommonJudge',
+    OutputOnly = 'OutputOnly',
+}
+
 export const enum JudgeSourceType {
     TEXT = 'TEXT',
     C = 'C',
@@ -20,15 +25,31 @@ export const enum JudgeSourceType {
 
 export interface SourceFile {
     name: string
-    ext: JudgeSourceType
     source: string
 }
 
-export interface JudgeRequest {
-    language: JudgeSourceType
-    source: string
-    input: string[]
-    output: string[]
+export interface DataSet {
+}
+
+export interface OutputOnly extends DataSet {
+    data: {
+        output: string
+    }[]
+}
+
+export interface CommonDataSet extends DataSet {
+    data: {
+        input: string
+        output: string
+    }[]
+}
+
+export interface JudgeRequest<TJudgeType extends JudgeType = JudgeType, TJudgeSourceType extends JudgeSourceType = JudgeSourceType, TDataSet extends DataSet = DataSet> {
+    uid: string
+    language: TJudgeSourceType
+    judgeType: TJudgeType
+    source: SourceFile[]
+    dataSet: TDataSet
     timeLimit: number
     memoryLimit: number
 }

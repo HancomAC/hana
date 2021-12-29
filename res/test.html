@@ -126,16 +126,24 @@
                 tws.onmessage = function (event) {
                     const res = JSON.parse(event.data)
                     if (res.type === 'JUDGE_FINISH')
-                        setCard(res.data.uid, 1, res.data.reason)
+                        setCard(
+                            res.data.uid,
+                            1,
+                            `${reasonString[res.data.reason]} / ${
+                                (res.data.result.reduce((a, b) => a + b, 0) /
+                                    2) *
+                                100
+                            }%`
+                        )
                     if (res.type === 'JUDGE_PROGRESS')
                         setCard(
                             res.data.uid,
                             res.data.progress,
-                            res.data.reason
+                            reasonString[res.data.reason]
                         )
                     if (res.type === 'JUDGE_STATUS') {
                         for (let i of res.data.waitList) {
-                            setCard(i, 0, 'PD')
+                            setCard(i, 0, reasonString['PD'])
                         }
                     }
                 }
@@ -148,8 +156,7 @@
                 let card = document.getElementById(`card-${id}`)
                 if (!card) card = addCard(id)
                 if (progress === 1) card.classList.add('success')
-                document.getElementById(`subtitle-${id}`).innerText =
-                    reasonString[reason]
+                document.getElementById(`subtitle-${id}`).innerText = reason
                 setTimeout(() => {
                     mdcProgress[id].foundation.setProgress(progress)
                 }, 1)
@@ -189,7 +196,27 @@
             }
 
             function test() {
-                fetch(`//${window.location.host}/judge`)
+                fetch(`//${window.location.host}/judge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        language: 'TEXT',
+                        judgeType: 'OutputOnly',
+                        source: [
+                            {
+                                name: '1',
+                                source: '123',
+                            },
+                        ],
+                        dataSet: {
+                            data: [{ output: '123' }, { output: '456' }],
+                        },
+                        timeLimit: 0,
+                        memoryLimit: 0,
+                    }),
+                })
             }
 
             document.addEventListener('DOMContentLoaded', () => {

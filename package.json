@@ -2,6 +2,7 @@
     "name": "hana",
     "version": "1.0.0",
     "dependencies": {
+        "body-parser": "^1.19.1",
         "express": "^4.17.2",
         "express-ws": "^5.0.2",
         "serve-favicon": "^2.5.0",

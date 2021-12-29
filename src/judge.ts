@@ -1,21 +1,19 @@
 import { sendMessage } from './socket'
-import type { Problem } from './types/problem'
 import { WebSocketResponseType } from './types/response'
 import { MultiJudgeCount } from './config'
+import { JudgeRequest } from './types/request'
+import executeJudge from './runner'
+import { JudgeResult } from './types/response'
 
 const waitList = [] as string[],
     judgeList = [] as string[]
-const problemMap = new Map<string, Problem>()
+const problemMap = new Map<string, JudgeRequest>()
 
-function judgeFinishHandler(problem: string) {
+function judgeFinishHandler(problem: string, result: JudgeResult) {
     if (judgeList.indexOf(problem) !== -1)
         judgeList.splice(judgeList.indexOf(problem), 1)
     if (problem) {
-        sendMessage(WebSocketResponseType.JUDGE_FINISH, {
-            uid: (problemMap.get(problem) as Problem).uid,
-            score: 100,
-            reason: 'AC',
-        })
+        sendMessage(WebSocketResponseType.JUDGE_FINISH, result)
     }
     while (judgeList.length < MultiJudgeCount && waitList.length)
         judge(waitList.shift() as string)
@@ -24,26 +22,17 @@ function judgeFinishHandler(problem: string) {
 function judge(problem: string) {
     judgeList.push(problem)
     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-        uid: (problemMap.get(problem) as Problem).uid,
+        uid: (problemMap.get(problem) as JudgeRequest).uid,
         progress: 0,
         reason: 'CP',
     })
-    const rt = Math.random() * 500
-    for (let i = 1; i < 10; i++) {
-        setTimeout(() => {
-            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                uid: (problemMap.get(problem) as Problem).uid,
-                progress: i / 10,
-                reason: 'RUN',
-            })
-        }, i * rt + 1000)
-    }
-    setTimeout(() => {
-        judgeFinishHandler(problem)
-    }, rt * 10 + 1000)
+    const result = executeJudge(
+        problemMap.get(problem) as JudgeRequest
+    ) as JudgeResult
+    judgeFinishHandler(problem, result)
 }
 
-export function requestJudge(problem: Problem) {
+export function requestJudge(problem: JudgeRequest) {
     waitList.push(problem.uid)
     problemMap.set(problem.uid, problem)
     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
