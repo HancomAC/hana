@@ -6,6 +6,7 @@ import {
 } from '../types/request'
 import { sendMessage } from '../socket'
 import { WebSocketResponseType } from '../types/response'
+import { isSame } from './index'
 
 export default function (
     data: JudgeRequest<JudgeType.OutputOnly, JudgeSourceType.TEXT, OutputOnly>
@@ -13,7 +14,7 @@ export default function (
     let match = Array(data.dataSet.data.length).fill(false)
     for (const s in data.source) {
         for (const i in data.dataSet.data) {
-            if (data.source[s].source === data.dataSet.data[i].output) {
+            if (isSame(data.source[s].source, data.dataSet.data[i].output)) {
                 match[i] = true
             }
         }
