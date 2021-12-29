@@ -8,6 +8,7 @@ import {
 
 import judgeText from './text'
 import judgeCPP from './cpp'
+import { JudgeResult } from '../types/response'
 
 export function execute(exePath: string, input: string) {
     return ''
@@ -25,7 +26,7 @@ export function isSame(in1: string, in2: string): boolean {
     return res1.length === res2.length && res1.every((x, i) => x === res2[i])
 }
 
-export default function (data: JudgeRequest) {
+export default function (data: JudgeRequest): Promise<JudgeResult> {
     switch (data.judgeType) {
         case JudgeType.OutputOnly:
             return judgeText(
@@ -47,4 +48,11 @@ export default function (data: JudgeRequest) {
                     )
             }
     }
+    return Promise.resolve({
+        uid: data.uid,
+        result: Array(data.dataSet.data.length).fill(false),
+        reason: 'CE',
+        time: 0,
+        memory: 0,
+    })
 }

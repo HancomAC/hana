@@ -26,10 +26,11 @@ function judge(problem: string) {
         progress: 0,
         reason: 'CP',
     })
-    const result = executeJudge(
-        problemMap.get(problem) as JudgeRequest
-    ) as JudgeResult
-    judgeFinishHandler(problem, result)
+    executeJudge(problemMap.get(problem) as JudgeRequest).then(
+        (res: JudgeResult) => {
+            judgeFinishHandler(problem, res)
+        }
+    )
 }
 
 export function requestJudge(problem: JudgeRequest) {

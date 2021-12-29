@@ -125,6 +125,7 @@
                 }
                 tws.onmessage = function (event) {
                     const res = JSON.parse(event.data)
+                    if (res.data.message) console.log(res.data.message)
                     if (res.type === 'JUDGE_FINISH')
                         setCard(
                             res.data.uid,

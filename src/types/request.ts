@@ -29,6 +29,7 @@ export interface SourceFile {
 }
 
 export interface DataSet {
+    data: any
 }
 
 export interface OutputOnly extends DataSet {
@@ -44,7 +45,11 @@ export interface CommonDataSet extends DataSet {
     }[]
 }
 
-export interface JudgeRequest<TJudgeType extends JudgeType = JudgeType, TJudgeSourceType extends JudgeSourceType = JudgeSourceType, TDataSet extends DataSet = DataSet> {
+export interface JudgeRequest<
+    TJudgeType extends JudgeType = JudgeType,
+    TJudgeSourceType extends JudgeSourceType = JudgeSourceType,
+    TDataSet extends DataSet = DataSet
+> {
     uid: string
     language: TJudgeSourceType
     judgeType: TJudgeType
