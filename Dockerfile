@@ -1,6 +1,6 @@
 FROM node:16-alpine
 EXPOSE 80
-RUN apk add --update alpine-sdk runuser
+RUN apk add --update alpine-sdk
 RUN apk update
 COPY dist/ /HANA/dist/
 COPY res/ /HANA/res/

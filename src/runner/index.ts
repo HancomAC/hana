@@ -14,13 +14,9 @@ import { spawn } from 'child_process'
 export function execute(userName: string, exePath: string, input: string) {
     return new Promise<{ code: number; stdout: string; stderr: string }>(
         (resolve, reject) => {
-            const child = spawn(
-                `runuser`,
-                ['-l', userName, '-c', `'${exePath}'`],
-                {
-                    stdio: ['pipe', 'pipe', 'pipe'],
-                }
-            )
+            const child = spawn(`su`, [userName, '-c', exePath], {
+                stdio: ['pipe', 'pipe', 'pipe'],
+            })
 
             child.stdin.write(input)
             child.stdin.end()
