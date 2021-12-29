@@ -17,9 +17,12 @@ export function execute(userName: string, exePath: string, input: string) {
             const child = spawn(`su`, [userName, '-c', exePath], {
                 stdio: ['pipe', 'pipe', 'pipe'],
             })
-
-            child.stdin.write(input)
-            child.stdin.end()
+            try {
+                child.stdin.write(input)
+            } catch (e) {}
+            try {
+                child.stdin.end()
+            } catch (e) {}
 
             let stdout = '',
                 stderr = ''
