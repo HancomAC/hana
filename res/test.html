@@ -1,136 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>HANA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
-          rel="stylesheet">
+    <head>
+        <meta charset="UTF-8" />
+        <title>HANA</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+            rel="stylesheet"
+        />
 
-    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-    <style>
-        html, body {
-            padding: 0;
-            margin: 0;
-        }
-
-        :root {
-            --mdc-theme-primary: #000;
-            --mdc-theme-secondary: #018786;
-            --mdc-theme-background: #fff;
-            --mdc-theme-surface: #fff;
-            --mdc-theme-error: #b00020;
-            --mdc-theme-on-primary: #000;
-            --mdc-theme-on-secondary: #fff;
-            --mdc-theme-on-surface: #000;
-            --mdc-theme-on-error: #fff;
-            --mdc-theme-text-primary-on-background: rgba(0, 0, 0, 0.87);
-            --mdc-theme-text-secondary-on-background: rgba(0, 0, 0, 0.54);
-            --mdc-theme-text-hint-on-background: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-disabled-on-background: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-icon-on-background: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-primary-on-light: rgba(0, 0, 0, 0.87);
-            --mdc-theme-text-secondary-on-light: rgba(0, 0, 0, 0.54);
-            --mdc-theme-text-hint-on-light: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-disabled-on-light: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-icon-on-light: rgba(0, 0, 0, 0.38);
-            --mdc-theme-text-primary-on-dark: black;
-            --mdc-theme-text-secondary-on-dark: rgba(255, 255, 255, 0.7);
-            --mdc-theme-text-hint-on-dark: rgba(255, 255, 255, 0.5);
-            --mdc-theme-text-disabled-on-dark: rgba(255, 255, 255, 0.5);
-            --mdc-theme-text-icon-on-dark: rgba(255, 255, 255, 0.5);
-        }
-
-        .mdc-top-app-bar {
-            color: black;
-            background: white;
-        }
-
-        body {
-            font-family: 'Noto Sans KR' !important;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: calc(50% - 20px) calc(50% - 20px);
-        }
-
-        .card {
-            padding: 10px;
-            margin: 10px;
-            transition: color 0.5s;
-        }
-
-        .card.success {
-            background-color: #e9ecf7;
-        }
-
-        .card > * {
-            margin: 5px 0;
-        }
-
-        .form {
-            padding: 10px;
-        }
-
-        .mdc-top-app-bar__logo {
-            height: 100%;
-            padding: 10px;
-        }
-
-        .logo {
-            height: calc(100% - 20px);
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-<script>
-    let judgeNo = 1;
-    const ws = new WebSocket('ws://localhost');
-    const mdcProgress = {}
-    const reasonString = {
-        'PD': 'Pending',
-        'AC': 'Accepted',
-        'WA': 'Wrong Answer',
-        'TLE': 'Time Limit Exceeded',
-        'MLE': 'Memory Limit Exceeded',
-        'OLE': 'Output Limit Exceeded',
-        'RE': 'Runtime Error',
-        'CE': 'Compile Error',
-        'CP': 'Compiling',
-        'RUN': 'Running',
-    }
-
-    ws.onmessage = function (event) {
-        const res = JSON.parse(event.data);
-        if (res.type === 'JUDGE_FINISH') setCard(res.data.uid, 1, res.data.reason)
-        if (res.type === 'JUDGE_PROGRESS') setCard(res.data.uid, res.data.progress, res.data.reason)
-        if (res.type === 'JUDGE_STATUS') {
-            for (let i of res.data.waitList) {
-                setCard(i, 0, 'PD')
+        <link
+            href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+        <style>
+            html,
+            body {
+                padding: 0;
+                margin: 0;
             }
-        }
-    };
 
-    function setCard(id, progress, reason = '') {
-        let card = document.getElementById(`card-${id}`);
-        if (!card) card = addCard(id);
-        if (progress === 1) card.classList.add('success')
-        document.getElementById(`subtitle-${id}`).innerText = reasonString[reason]
-        setTimeout(() => {
-            mdcProgress[id].foundation.setProgress(progress);
-        }, 100);
-    }
+            :root {
+                --mdc-theme-primary: #000;
+                --mdc-theme-secondary: #018786;
+                --mdc-theme-background: #fff;
+                --mdc-theme-surface: #fff;
+                --mdc-theme-error: #b00020;
+                --mdc-theme-on-primary: #000;
+                --mdc-theme-on-secondary: #fff;
+                --mdc-theme-on-surface: #000;
+                --mdc-theme-on-error: #fff;
+                --mdc-theme-text-primary-on-background: rgba(0, 0, 0, 0.87);
+                --mdc-theme-text-secondary-on-background: rgba(0, 0, 0, 0.54);
+                --mdc-theme-text-hint-on-background: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-disabled-on-background: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-icon-on-background: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-primary-on-light: rgba(0, 0, 0, 0.87);
+                --mdc-theme-text-secondary-on-light: rgba(0, 0, 0, 0.54);
+                --mdc-theme-text-hint-on-light: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-disabled-on-light: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-icon-on-light: rgba(0, 0, 0, 0.38);
+                --mdc-theme-text-primary-on-dark: black;
+                --mdc-theme-text-secondary-on-dark: rgba(255, 255, 255, 0.7);
+                --mdc-theme-text-hint-on-dark: rgba(255, 255, 255, 0.5);
+                --mdc-theme-text-disabled-on-dark: rgba(255, 255, 255, 0.5);
+                --mdc-theme-text-icon-on-dark: rgba(255, 255, 255, 0.5);
+            }
 
-    function addCard(id) {
-        let card = document.createElement('div');
-        let title = document.createElement('h2');
-        let subTitle = document.createElement('h4');
-        let progress = document.createElement('div');
-        progress.className = 'mdc-linear-progress'
-        progress.id = `progress-${id}`;
-        progress.innerHTML = `<div class="mdc-linear-progress__buffer">
+            .mdc-top-app-bar {
+                color: black;
+                background: white;
+            }
+
+            body {
+                font-family: 'Noto Sans KR' !important;
+            }
+
+            .container {
+                display: grid;
+                grid-template-columns: calc(50% - 20px) calc(50% - 20px);
+            }
+
+            .card {
+                padding: 10px;
+                margin: 10px;
+                transition: color 0.5s;
+            }
+
+            .card.success {
+                background-color: #e9ecf7;
+            }
+
+            .card > * {
+                margin: 5px 0;
+            }
+
+            .form {
+                padding: 10px;
+            }
+
+            .mdc-top-app-bar__logo {
+                height: 100%;
+                padding: 10px;
+            }
+
+            .logo {
+                height: calc(100% - 20px);
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            let judgeNo = 1
+            const ws = new WebSocket('ws://localhost')
+            const mdcProgress = {}
+            const reasonString = {
+                PD: 'Pending',
+                AC: 'Accepted',
+                WA: 'Wrong Answer',
+                TLE: 'Time Limit Exceeded',
+                MLE: 'Memory Limit Exceeded',
+                OLE: 'Output Limit Exceeded',
+                RE: 'Runtime Error',
+                CE: 'Compile Error',
+                CP: 'Compiling',
+                RUN: 'Running',
+            }
+
+            ws.onmessage = function (event) {
+                const res = JSON.parse(event.data)
+                if (res.type === 'JUDGE_FINISH')
+                    setCard(res.data.uid, 1, res.data.reason)
+                if (res.type === 'JUDGE_PROGRESS')
+                    setCard(res.data.uid, res.data.progress, res.data.reason)
+                if (res.type === 'JUDGE_STATUS') {
+                    for (let i of res.data.waitList) {
+                        setCard(i, 0, 'PD')
+                    }
+                }
+            }
+
+            function setCard(id, progress, reason = '') {
+                let card = document.getElementById(`card-${id}`)
+                if (!card) card = addCard(id)
+                if (progress === 1) card.classList.add('success')
+                document.getElementById(`subtitle-${id}`).innerText =
+                    reasonString[reason]
+                setTimeout(() => {
+                    mdcProgress[id].foundation.setProgress(progress)
+                }, 100)
+            }
+
+            function addCard(id) {
+                let card = document.createElement('div')
+                let title = document.createElement('h2')
+                let subTitle = document.createElement('h4')
+                let progress = document.createElement('div')
+                progress.className = 'mdc-linear-progress'
+                progress.id = `progress-${id}`
+                progress.innerHTML = `<div class="mdc-linear-progress__buffer">
             <div class="mdc-linear-progress__buffer-bar"></div>
             <div class="mdc-linear-progress__buffer-dots"></div>
           </div>
@@ -140,44 +149,53 @@
           <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
             <span class="mdc-linear-progress__bar-inner"></span>
           </div>`
-        title.innerText = `#${judgeNo++}`;
-        subTitle.innerText = id;
-        subTitle.id = `subtitle-${id}`;
-        card.id = `card-${id}`;
-        card.append(title);
-        card.append(subTitle);
-        card.append(progress);
-        card.className = 'mdc-card mdc-card--outlined card'
-        document.querySelector('.container').prepend(card)
-        const linearProgress = new mdc.linearProgress.MDCLinearProgress(document.getElementById(`progress-${id}`));
-        mdcProgress[id] = linearProgress;
-        return card;
-    }
+                title.innerText = `#${judgeNo++}`
+                subTitle.innerText = id
+                subTitle.id = `subtitle-${id}`
+                card.id = `card-${id}`
+                card.append(title)
+                card.append(subTitle)
+                card.append(progress)
+                card.className = 'mdc-card mdc-card--outlined card'
+                document.querySelector('.container').prepend(card)
+                const linearProgress = new mdc.linearProgress.MDCLinearProgress(
+                    document.getElementById(`progress-${id}`)
+                )
+                mdcProgress[id] = linearProgress
+                return card
+            }
 
-    function test() {
-        fetch('//localhost/judge')
-    }
-</script>
-<header class="mdc-top-app-bar">
-    <div class="mdc-top-app-bar__row">
-        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-            <span class="mdc-top-app-bar__logo">
-                <img src="/test/logo" alt="logo" class="logo">
-            </span>
-            <span class="mdc-top-app-bar__title">HANA</span>
-        </section>
-        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        </section>
-    </div>
-</header>
-<main class="mdc-top-app-bar--fixed-adjust">
-    <div class="form">
-        <button class="mdc-button mdc-button--outlined" onclick="test()">
-            <span class="mdc-button__ripple"></span>
-            Request Test Judgement
-        </button>
-    </div>
-    <div class="container"></div>
-</main>
-</body>
+            function test() {
+                fetch('//localhost/judge')
+            }
+        </script>
+        <header class="mdc-top-app-bar">
+            <div class="mdc-top-app-bar__row">
+                <section
+                    class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+                >
+                    <span class="mdc-top-app-bar__logo">
+                        <img src="/test/logo" alt="logo" class="logo" />
+                    </span>
+                    <span class="mdc-top-app-bar__title">HANA</span>
+                </section>
+                <section
+                    class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+                    role="toolbar"
+                ></section>
+            </div>
+        </header>
+        <main class="mdc-top-app-bar--fixed-adjust">
+            <div class="form">
+                <button
+                    class="mdc-button mdc-button--outlined"
+                    onclick="test()"
+                >
+                    <span class="mdc-button__ripple"></span>
+                    Request Test Judgement
+                </button>
+            </div>
+            <div class="container"></div>
+        </main>
+    </body>
 </html>

@@ -1,35 +1,37 @@
-import {WebSocket} from "ws";
-import expressWs from "express-ws";
-import {WebSocketResponse, WebSocketResponseType} from "./types/response";
-import {WebSocketRequest, WebSocketRequestType} from "./types/request";
-import {getJudgeInfo} from "./judge";
+import { WebSocket } from 'ws'
+import expressWs from 'express-ws'
+import { WebSocketResponse, WebSocketResponseType } from './types/response'
+import { WebSocketRequest, WebSocketRequestType } from './types/request'
+import { getJudgeInfo } from './judge'
 
 let wsObject = null as WebSocket | null
 let messageList = [] as string[]
 
 export function sendMessage(type: WebSocketResponseType, data?: any) {
     if (wsObject) {
-        wsObject.send(JSON.stringify({
-            success: true,
-            type,
-            data
-        } as WebSocketResponse));
+        wsObject.send(
+            JSON.stringify({
+                success: true,
+                type,
+                data,
+            } as WebSocketResponse)
+        )
     }
 }
 
 export function sendError(reason: string) {
     const message = JSON.stringify({
         success: false,
-        error: reason
+        error: reason,
     } as WebSocketResponse)
     if (wsObject) {
         wsObject.send(message, () => {
             if (wsObject) {
-                wsObject.close();
-                wsObject = null;
+                wsObject.close()
+                wsObject = null
             }
             messageList.push(message)
-        });
+        })
     } else messageList.push(message)
 }
 
@@ -52,11 +54,14 @@ export function init(app: expressWs.Application) {
                 switch (message.type) {
                     case WebSocketRequestType.JUDGE_INFO:
                         sendMessage(WebSocketResponseType.JUDGE_INFO, {
-                            version: "1.0.0"
+                            version: '1.0.0',
                         })
                         break
                     case WebSocketRequestType.JUDGE_STATUS:
-                        sendMessage(WebSocketResponseType.JUDGE_STATUS, getJudgeInfo())
+                        sendMessage(
+                            WebSocketResponseType.JUDGE_STATUS,
+                            getJudgeInfo()
+                        )
                         break
                     default:
                         sendError('Invalid message')
@@ -65,9 +70,9 @@ export function init(app: expressWs.Application) {
             } catch (e) {
                 sendError('JSON Parse Error')
             }
-        });
+        })
         ws.on('disconnect', function () {
             wsObject = null
-        });
-    });
+        })
+    })
 }
