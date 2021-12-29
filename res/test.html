@@ -129,11 +129,9 @@
                         setCard(
                             res.data.uid,
                             1,
-                            `${reasonString[res.data.reason]} / ${
-                                (res.data.result.reduce((a, b) => a + b, 0) /
-                                    2) *
-                                100
-                            }%`
+                            `${
+                                reasonString[res.data.reason]
+                            } / ${res.data.result.map((x) => x + 0)}`
                         )
                     if (res.type === 'JUDGE_PROGRESS')
                         setCard(
@@ -202,22 +200,25 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        language: 'TEXT',
-                        judgeType: 'OutputOnly',
+                        language: 'CPP',
+                        judgeType: 'CommonJudge',
                         source: [
                             {
-                                name: '1',
-                                source: `123
-                                `,
+                                name: 'main.cpp',
+                                source: document.getElementById('source').value,
                             },
                         ],
                         dataSet: {
-                            data: [{ output: '123' }, { output: '456' }],
+                            data: [{ input: '1 2', output: '3' }],
                         },
                         timeLimit: 0,
                         memoryLimit: 0,
                     }),
                 })
+            }
+
+            function hard() {
+                for (let i = 0; i < 500; i++) test()
             }
 
             document.addEventListener('DOMContentLoaded', () => {
@@ -258,18 +259,42 @@
                 </section>
                 <section
                     class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
-                    role="toolbar"
                 ></section>
             </div>
         </header>
         <main class="mdc-top-app-bar--fixed-adjust">
             <div class="form">
+                <label
+                    class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea mdc-text-field--no-label"
+                    style="width: calc(100vw - 20px); margin: 10px 0"
+                >
+                    <span class="mdc-notched-outline">
+                        <span class="mdc-notched-outline__leading"></span>
+                        <span class="mdc-notched-outline__trailing"></span>
+                    </span>
+                    <span class="mdc-text-field__resizer">
+                        <textarea
+                            class="mdc-text-field__input"
+                            rows="8"
+                            cols="40"
+                            aria-label="Label"
+                            id="source"
+                        ></textarea>
+                    </span>
+                </label>
                 <button
                     class="mdc-button mdc-button--outlined"
                     onclick="test()"
                 >
                     <span class="mdc-button__ripple"></span>
                     Request Test Judgement
+                </button>
+                <button
+                    class="mdc-button mdc-button--outlined"
+                    onclick="hard()"
+                >
+                    <span class="mdc-button__ripple"></span>
+                    Load Test
                 </button>
                 <div
                     class="mdc-card mdc-card--outlined card"

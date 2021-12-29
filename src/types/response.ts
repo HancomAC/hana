@@ -26,4 +26,5 @@ export interface JudgeResult {
         output: string
         no: number
     }
+    message?: string
 }

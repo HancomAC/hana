@@ -27,7 +27,7 @@ export default function (
     return {
         uid: data.uid,
         result: match,
-        reason: match.length === data.source.length ? 'AC' : 'WA',
+        reason: match.reduce((a, b) => a + b, 0) === match.length ? 'AC' : 'WA',
         time: 0,
         memory: 0,
     }

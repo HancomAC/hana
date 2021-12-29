@@ -1,4 +1,5 @@
 import {
+    CommonDataSet,
     JudgeRequest,
     JudgeSourceType,
     JudgeType,
@@ -6,6 +7,11 @@ import {
 } from '../types/request'
 
 import judgeText from './text'
+import judgeCPP from './cpp'
+
+export function execute(exePath: string, input: string) {
+    return ''
+}
 
 export function isSame(in1: string, in2: string): boolean {
     let res1 = in1
@@ -31,6 +37,14 @@ export default function (data: JudgeRequest) {
             )
         case JudgeType.CommonJudge:
             switch (data.language) {
+                case JudgeSourceType.CPP:
+                    return judgeCPP(
+                        data as JudgeRequest<
+                            JudgeType.CommonJudge,
+                            JudgeSourceType.CPP,
+                            CommonDataSet
+                        >
+                    )
             }
     }
 }
