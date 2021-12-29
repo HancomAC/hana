@@ -56,9 +56,9 @@
                 font-family: 'Noto Sans KR' !important;
             }
 
-            .container {
-                display: grid;
-                grid-template-columns: calc(50% - 20px) calc(50% - 20px);
+            .container > div {
+                width: 400px;
+                display: inline-block;
             }
 
             .card {
@@ -98,7 +98,7 @@
     <body>
         <script>
             let judgeNo = 1
-            let ws
+            let ws, tws
             const mdcProgress = {}
             const reasonString = {
                 PD: 'Pending',
@@ -140,20 +140,9 @@
                     }
                 }
                 tws.addEventListener('close', () => {
-                    ws = null
+                    ws = tws = null
                 })
             }
-
-            setInterval(() => {
-                if (!ws) {
-                    connectWs()
-                    document.getElementById('connection-error').style.display =
-                        ''
-                } else {
-                    document.getElementById('connection-error').style.display =
-                        'none'
-                }
-            }, 100)
 
             function setCard(id, progress, reason = '') {
                 let card = document.getElementById(`card-${id}`)
@@ -163,7 +152,7 @@
                     reasonString[reason]
                 setTimeout(() => {
                     mdcProgress[id].foundation.setProgress(progress)
-                }, 100)
+                }, 1)
             }
 
             function addCard(id) {
@@ -202,6 +191,30 @@
             function test() {
                 fetch(`//${window.location.host}/judge`)
             }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                setInterval(() => {
+                    if (document.documentElement.scrollTop)
+                        document
+                            .querySelector('header')
+                            .classList.add('mdc-elevation--z5')
+                    else
+                        document
+                            .querySelector('header')
+                            .classList.remove('mdc-elevation--z5')
+                })
+
+                setInterval(() => {
+                    if (!ws) {
+                        if (!tws) connectWs()
+                        document.getElementById('connection-error').style.display =
+                            ''
+                    } else {
+                        document.getElementById('connection-error').style.display =
+                            'none'
+                    }
+                }, 100)
+            })
         </script>
         <header class="mdc-top-app-bar">
             <div class="mdc-top-app-bar__row">
@@ -231,6 +244,7 @@
                 <div
                     class="mdc-card mdc-card--outlined card"
                     id="connection-error"
+                    style="display: none"
                 >
                     <h3>Connection lost.</h3>
                     <p>Trying to reconnect...</p>
