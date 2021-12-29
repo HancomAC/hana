@@ -207,11 +207,13 @@
                 setInterval(() => {
                     if (!ws) {
                         if (!tws) connectWs()
-                        document.getElementById('connection-error').style.display =
-                            ''
+                        document.getElementById(
+                            'connection-error'
+                        ).style.display = ''
                     } else {
-                        document.getElementById('connection-error').style.display =
-                            'none'
+                        document.getElementById(
+                            'connection-error'
+                        ).style.display = 'none'
                     }
                 }, 100)
             })
