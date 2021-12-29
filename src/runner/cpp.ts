@@ -8,7 +8,7 @@ import { sendMessage } from '../socket'
 import { JudgeResult, WebSocketResponseType } from '../types/response'
 import { execute, isSame } from './index'
 import * as fs from 'fs'
-import { spawn, execSync } from 'child_process'
+import { execSync } from 'child_process'
 
 export default function (
     data: JudgeRequest<
@@ -28,10 +28,12 @@ export default function (
             reason: 'CP',
         })
 
-        execSync(`adduser --disabled-password --no-create-home p-${data.uid}`)
+        execSync(`adduser --disabled-password --no-create-home p-${data.uid}`, {
+            stdio: 'ignore',
+        })
 
         fs.mkdirSync(tmpPath)
-        execSync(`chmod 777 ${tmpPath}`)
+        execSync(`chmod 777 ${tmpPath}`, { stdio: 'ignore' })
 
         for (const i of data.source)
             fs.writeFileSync(tmpPath + '/' + i.name, i.source)
@@ -76,7 +78,7 @@ export default function (
             })
         }
         fs.rmSync(tmpPath, { recursive: true })
-        execSync(`deluser p-${data.uid}`)
+        execSync(`deluser p-${data.uid}`, { stdio: 'ignore' })
         resolve({
             uid: data.uid,
             result: match,

@@ -47,6 +47,6 @@ export function requestJudge(problem: JudgeRequest) {
 
 export function getJudgeInfo() {
     return {
-        waitList,
+        waitList: [...judgeList, ...waitList],
     }
 }
