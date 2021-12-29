@@ -9,9 +9,38 @@ import {
 import judgeText from './text'
 import judgeCPP from './cpp'
 import { JudgeResult } from '../types/response'
+import { spawn } from 'child_process'
 
-export function execute(exePath: string, input: string) {
-    return ''
+export function execute(userName: string, exePath: string, input: string) {
+    return new Promise<{ code: number; stdout: string; stderr: string }>(
+        (resolve, reject) => {
+            const child = spawn(
+                `runuser`,
+                ['-l', userName, '-c', `'${exePath}'`],
+                {
+                    stdio: ['pipe', 'pipe', 'pipe'],
+                }
+            )
+
+            child.stdin.write(input)
+            child.stdin.end()
+
+            let stdout = '',
+                stderr = ''
+
+            child.stdout.on('data', (data: any) => {
+                stdout += data
+            })
+
+            child.stderr.on('data', (data: any) => {
+                stderr += data
+            })
+
+            child.on('close', (code) => {
+                resolve({ code: code || 0, stdout, stderr })
+            })
+        }
+    )
 }
 
 export function isSame(in1: string, in2: string): boolean {

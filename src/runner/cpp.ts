@@ -8,7 +8,7 @@ import { sendMessage } from '../socket'
 import { JudgeResult, WebSocketResponseType } from '../types/response'
 import { execute, isSame } from './index'
 import * as fs from 'fs'
-import { spawn } from 'child_process'
+import { spawn, execSync } from 'child_process'
 
 export default function (
     data: JudgeRequest<
@@ -50,7 +50,7 @@ export default function (
             if (data) stderr += data.toString()
         })
 
-        cp.on('exit', (code) => {
+        cp.on('exit', async (code) => {
             if (code !== 0) {
                 fs.rmdirSync(tmpPath, { recursive: true })
                 resolve({
@@ -63,6 +63,9 @@ export default function (
                 })
                 return
             } else {
+                execSync(
+                    `adduser --disabled-password --no-create-home p-${data.uid}`
+                )
                 sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                     uid: data.uid,
                     progress: 0,
@@ -70,14 +73,13 @@ export default function (
                 })
 
                 for (const i in data.dataSet.data) {
-                    if (
-                        isSame(
-                            execute(exePath, data.dataSet.data[i].input),
-                            data.dataSet.data[i].output
-                        )
-                    ) {
+                    const result = await execute(
+                        `p-${data.uid}`,
+                        exePath,
+                        data.dataSet.data[i].input
+                    )
+                    if (isSame(result.stdout, data.dataSet.data[i].output))
                         match[i] = true
-                    }
                     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                         uid: data.uid,
                         progress:
@@ -85,7 +87,7 @@ export default function (
                         reason: 'RUN',
                     })
                 }
-                fs.rmdirSync(tmpPath, { recursive: true })
+                fs.rmSync(tmpPath, { recursive: true })
                 resolve({
                     uid: data.uid,
                     result: match,
@@ -96,6 +98,7 @@ export default function (
                     time: 0,
                     memory: 0,
                 })
+                execSync(`deluser p-${data.uid}`)
             }
         })
     })
