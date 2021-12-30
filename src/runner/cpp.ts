@@ -10,9 +10,15 @@ import {
     JudgeResultCode,
     WebSocketResponseType,
 } from '../types/response'
-import { execute, isSame, ResultType } from './index'
-import * as fs from 'fs'
-import { execSync } from 'child_process'
+import {
+    initTempEnv,
+    execute,
+    isSame,
+    ResultType,
+    executeJudge,
+    clearTempEnv,
+    getLimitString,
+} from './util'
 
 export default function (
     data: JudgeRequest<
@@ -25,8 +31,6 @@ export default function (
         let match = Array(data.dataSet.data.length).fill(false),
             judgeResult = 'AC' as JudgeResultCode,
             message = ''
-        const tmpPath = '/tmp/' + data.uid
-        const exePath = tmpPath + '/main'
 
         sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
             uid: data.uid,
@@ -34,27 +38,21 @@ export default function (
             reason: 'CP',
         })
 
-        execSync(
-            `adduser -g execute --disabled-password --no-create-home p-${data.uid}`,
-            {
-                stdio: 'ignore',
-            }
-        )
-
-        fs.mkdirSync(tmpPath)
-        execSync(`chmod 777 ${tmpPath}`, { stdio: 'ignore' })
-
-        for (const i of data.source)
-            fs.writeFileSync(tmpPath + '/' + i.name, i.source)
+        const tmpPath = initTempEnv(data.uid, data.source)
+        const exePath = tmpPath + '/main'
+        let maxMemoryUsage = 0,
+            maxTimeUsage = 0
 
         const result = await execute(
             `p-${data.uid}`,
-            `g++ ${tmpPath}/main.cpp -o ${exePath} -O2 -Wall -lm --static -pipe -std=c++17`,
-            ''
+            getLimitString(
+                { cpuLimit: 6 },
+                `g++ ${tmpPath}/main.cpp -o ${exePath} -O2 -Wall -lm --static -pipe -std=c++17`
+            )
         )
 
         if (result.code !== 0) {
-            fs.rmSync(tmpPath, { recursive: true })
+            clearTempEnv(data.uid)
             resolve({
                 uid: data.uid,
                 result: match,
@@ -73,19 +71,16 @@ export default function (
         })
 
         for (const i in data.dataSet.data) {
-            const { code, stdout, stderr, resultType } = await execute(
-                `p-${data.uid}`,
-                `ulimit -m ${data.memoryLimit * 1024};ulimit -v ${
-                    data.memoryLimit * 1024
-                };ulimit -n 2;cpulimit -l 6 -- time -v ${exePath}`,
-                data.dataSet.data[i].input,
-                data.timeLimit || 1
+            const { code, stdout, stderr, resultType } = await executeJudge(
+                data,
+                exePath,
+                data.dataSet.data[i].input
             )
             if (code) {
                 let errorMsg = ''
                 switch (resultType) {
                     case ResultType.normal:
-                        errorMsg = stderr.split('\n').slice(0, -23).join('\n')
+                        errorMsg = stderr.split('\n').slice(0, -2).join('\n')
                         if (judgeResult === 'AC')
                             judgeResult = 'RE' as JudgeResultCode
                         break
@@ -95,9 +90,12 @@ export default function (
                 }
                 if (!message) message = errorMsg
             } else {
-                const errorMsg = stderr.split('\n').slice(0, -23).join('\n')
-                const info = stderr.split('\n').slice(-23).join('\n')
-                const memUsage = info.match(/max resident set size: (\d+)/)?.[1]
+                const info = stderr.split('\n').slice(-2)[0]
+                const timeUsage =
+                    parseFloat(info.split('m ')[1].split('s')[0]) * 1000
+                const memUsage = parseInt(info.split('|')[1])
+                maxTimeUsage = Math.max(maxTimeUsage, timeUsage)
+                maxMemoryUsage = Math.max(maxMemoryUsage, memUsage)
                 if (isSame(stdout, data.dataSet.data[i].output)) match[i] = true
                 else if (judgeResult === 'AC')
                     judgeResult = 'WA' as JudgeResultCode
@@ -108,14 +106,13 @@ export default function (
                 reason: 'RUN',
             })
         }
-        fs.rmSync(tmpPath, { recursive: true })
-        execSync(`deluser p-${data.uid}`, { stdio: 'ignore' })
+        clearTempEnv(data.uid)
         resolve({
             uid: data.uid,
             result: match,
             reason: judgeResult,
-            time: 0,
-            memory: 0,
+            time: maxTimeUsage,
+            memory: maxMemoryUsage,
             message: message,
         })
     })

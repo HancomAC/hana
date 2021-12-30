@@ -6,7 +6,7 @@ import {
 } from '../types/request'
 import { sendMessage } from '../socket'
 import { JudgeResult, WebSocketResponseType } from '../types/response'
-import { isSame } from './index'
+import { isSame } from './util'
 
 export default function (
     data: JudgeRequest<JudgeType.OutputOnly, JudgeSourceType.TEXT, OutputOnly>
