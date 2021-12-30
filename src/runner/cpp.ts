@@ -1,19 +1,8 @@
-import {
-    CommonDataSet,
-    JudgeRequest,
-    JudgeSourceType,
-    JudgeType,
-} from '../types/request'
+import { JudgeRequest } from '../types/request'
 import { execute, getLimitString } from './util'
 import commonJudge from './common'
 
-export default function (
-    data: JudgeRequest<
-        JudgeType.CommonJudge,
-        JudgeSourceType.CPP,
-        CommonDataSet
-    >
-) {
+export default function (data: JudgeRequest) {
     return commonJudge(
         data,
         (path) =>

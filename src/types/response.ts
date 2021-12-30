@@ -18,7 +18,7 @@ export interface WebSocketResponse {
 
 export interface JudgeResult {
     uid: string
-    result: boolean[]
+    result: number[]
     reason: JudgeResultCode
     time: number
     memory: number

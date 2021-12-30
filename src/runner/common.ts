@@ -16,11 +16,11 @@ import {
 
 export default function commonJudge(
     data: JudgeRequest,
-    build: (path: string) => Promise<ExecuteResult>,
+    build: ((path: string) => Promise<ExecuteResult>) | null,
     getExePath: (path: string) => string
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
-        let match = Array(data.dataSet.data.length).fill(false),
+        let match = Array(data.dataSet.data.length).fill(0),
             judgeResult = 'AC' as JudgeResultCode,
             message = ''
 
@@ -35,18 +35,21 @@ export default function commonJudge(
         let maxMemoryUsage = 0,
             maxTimeUsage = 0
 
-        const buildResult = await build(tmpPath)
-        if (buildResult.code) {
-            clearTempEnv(data.uid)
-            resolve({
-                uid: data.uid,
-                result: match,
-                reason: 'CE',
-                time: 0,
-                memory: 0,
-                message: buildResult.stderr,
-            })
-            return
+        if (build) {
+            const buildResult = await build(tmpPath)
+
+            if (buildResult.code) {
+                clearTempEnv(data.uid)
+                resolve({
+                    uid: data.uid,
+                    result: match,
+                    reason: 'CE',
+                    time: 0,
+                    memory: 0,
+                    message: buildResult.stderr,
+                })
+                return
+            }
         }
 
         sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
@@ -73,7 +76,8 @@ export default function commonJudge(
                         errorMsg = stderr
                         judgeResult = 'TLE' as JudgeResultCode
                 }
-                if (!message) message = errorMsg
+                if (!message)
+                    message = errorMsg.replaceAll(`/tmp/${data.uid}`, '~')
             } else {
                 let info = '',
                     err = stderr.split('\n')
@@ -84,7 +88,7 @@ export default function commonJudge(
                 maxTimeUsage = Math.max(maxTimeUsage, timeUsage)
                 maxMemoryUsage = Math.max(maxMemoryUsage, memUsage)
                 if (isSame(stdout, data.dataSet.data[i].output))
-                    match[i as any] = true
+                    match[i as any] = 1
                 else if (judgeResult === 'AC')
                     judgeResult = 'WA' as JudgeResultCode
             }
