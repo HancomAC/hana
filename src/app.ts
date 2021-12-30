@@ -36,18 +36,30 @@ app.get('/test', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'res', 'test.html'))
 })
 
-app.get('/test/logo', function (req, res) {
+app.get('/res/logo', function (req, res) {
     res.sendFile(path.join(__dirname, '..', 'res', 'logo.png'))
 })
 
-app.get('/', function (req, res) {
-    res.send('HANA v1.0')
+app.get('/res/github', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'res', 'github.png'))
 })
+
+app.get('/res/docs', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'res', 'docs.png'))
+})
+
+app.get('/res/test', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'res', 'test.png'))
+})
+
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '..', 'res', 'index.html'))
+})
+
+app.use(favicon(__dirname + '/../res/logo.ico'))
 
 app.use('*', function (req, res) {
     res.redirect('http://jungol.co.kr')
 })
-
-app.use(favicon(__dirname + '/../res/logo.ico'))
 
 app.listen(80)

@@ -11,6 +11,7 @@ import judgeText from './text'
 import judgeCPP from './cpp'
 import judgePython3 from './python3'
 import judgePypy3 from './pypy3'
+import judgeJava from './java'
 
 export default function (data: JudgeRequest): Promise<JudgeResult> {
     switch (data.judgeType) {
@@ -45,6 +46,14 @@ export default function (data: JudgeRequest): Promise<JudgeResult> {
                         data as JudgeRequest<
                             JudgeType.CommonJudge,
                             JudgeSourceType.PYPY3,
+                            CommonDataSet
+                        >
+                    )
+                case JudgeSourceType.JAVA:
+                    return judgeJava(
+                        data as JudgeRequest<
+                            JudgeType.CommonJudge,
+                            JudgeSourceType.JAVA,
                             CommonDataSet
                         >
                     )

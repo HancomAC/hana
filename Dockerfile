@@ -17,6 +17,11 @@ RUN export LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV LANGUAGE=C.UTF-8
 
+# Install Java
+RUN apk add openjdk11 --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
+                      --repository http://dl-cdn.alpinelinux.org/alpine/edge/main
+
+
 # Copy files & Install requirements
 RUN addgroup execute
 WORKDIR /HANA

@@ -10,9 +10,9 @@ export default function (data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `g++ ${path}/Main.cpp -o ${path}/main -O2 -Wall -lm --static -pipe -std=c++17`
+                    `javac ${path}/Main.java`
                 )
             ),
-        (path) => path + '/main'
+        (path) => `java -cp ${path} Main`,
     )
 }
