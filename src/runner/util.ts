@@ -23,7 +23,7 @@ export function execute(
         const child = spawn(`su`, [userName, '-c', exePath], {
             stdio: ['pipe', 'pipe', 'pipe'],
         })
-        child.stdin.on('error', (err) => {
+        child.stdin.on('error', () => {
             resolve({
                 resultType: ResultType.stdioError,
                 code: -1,
@@ -31,7 +31,7 @@ export function execute(
                 stderr: '',
             })
         })
-        child.on('error', (err) => {
+        child.on('error', () => {
             resolve({
                 resultType: ResultType.stdioError,
                 code: -1,
@@ -40,9 +40,11 @@ export function execute(
             })
         })
 
-        let timeHandler: NodeJS.Timeout
+        let timeHandler: NodeJS.Timeout,
+            timeouted = false
         if (timeout)
             timeHandler = setTimeout(() => {
+                timeouted = true
                 child.kill()
                 resolve({
                     resultType: ResultType.timeLimitExceeded,
@@ -67,6 +69,7 @@ export function execute(
         })
 
         child.on('close', (code) => {
+            if (timeouted) return
             if (timeHandler) clearTimeout(timeHandler)
             resolve({
                 resultType: ResultType.normal,
@@ -125,7 +128,7 @@ export function getLimitString(
                   limit.memoryLimit * 1024
               };`
             : ''
-    }${limit.cpuLimit ? `cpulimit -l ${limit.cpuLimit} -- ` : ''}${command}`
+    }${limit.cpuLimit ? `cpulimit -i -l ${limit.cpuLimit} -- ` : ''}${command}`
 }
 
 export function executeJudge(
@@ -136,7 +139,7 @@ export function executeJudge(
     return execute(
         `p-${data.uid}`,
         getLimitString(
-            { memoryLimit: data.memoryLimit, cpuLimit: 6 },
+            { memoryLimit: data.memoryLimit, cpuLimit: 10 },
             `/usr/bin/time -f "%E|%M" ${exePath}`
         ),
         input,

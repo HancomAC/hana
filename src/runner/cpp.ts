@@ -46,7 +46,7 @@ export default function (
         const result = await execute(
             `p-${data.uid}`,
             getLimitString(
-                { cpuLimit: 6 },
+                { cpuLimit: 50 },
                 `g++ ${tmpPath}/main.cpp -o ${exePath} -O2 -Wall -lm --static -pipe -std=c++17`
             )
         )

@@ -166,7 +166,9 @@
                                 <h4>Message</h4>
                                 <p>${res.data.message}</p>
                                 <h4>Run Info</h4>
-                                <p>Time: ${res.data.time}, Memory: ${res.data.memory}</p>
+                                <p>Time: ${res.data.time}ms, Memory: ${
+                                res.data.memory
+                            }KB</p>
                              </div>`
                         )
                     if (res.type === 'JUDGE_PROGRESS')
@@ -256,10 +258,9 @@
                 card.className = 'mdc-card mdc-card--outlined card'
                 document.querySelector('.container').prepend(card)
                 mdc.ripple.MDCRipple.attachTo(body)
-                const linearProgress = new mdc.linearProgress.MDCLinearProgress(
+                mdcProgress[id] = new mdc.linearProgress.MDCLinearProgress(
                     document.getElementById(`progress-${id}`)
                 )
-                mdcProgress[id] = linearProgress
                 return card
             }
 
