@@ -62,16 +62,31 @@
             }
 
             .card {
-                padding: 10px;
                 margin: 10px;
                 transition: color 0.5s;
             }
 
-            .card.success {
+            .card.simple,
+            .card .mdc-card__primary-action {
+                padding: 10px;
+            }
+
+            .card.AC {
                 background-color: #e9ecf7;
             }
 
-            .card > * {
+            .card.AC {
+                background-color: #e9ecf7;
+            }
+            .card.WA {
+                background-color: #f7e9e9;
+            }
+            .card.RTE, .card.CE {
+                background-color: #fcffe6;
+            }
+
+            .card.simple > *,
+            .card > .mdc-card__primary-action > *:not(.mdc-card__ripple) {
                 margin: 5px 0;
             }
 
@@ -93,12 +108,20 @@
                 background: #ffebef;
                 margin: 10px 0;
             }
+
+            .mdc-top-app-bar__title {
+                font-weight: 900;
+                font-size: 1.75rem;
+            }
         </style>
     </head>
     <body>
         <script>
             let judgeNo = 1
-            let ws, tws
+            let ws,
+                tws,
+                dialog,
+                pmp = new Map()
             const mdcProgress = {}
             const reasonString = {
                 PD: 'Pending',
@@ -120,29 +143,56 @@
                     tws = null
                     return
                 }
+                tws.onerror = () => {}
                 tws.onopen = () => {
                     ws = tws
                 }
                 tws.onmessage = function (event) {
                     const res = JSON.parse(event.data)
-                    if (res.data.message) console.log(res.data.message)
                     if (res.type === 'JUDGE_FINISH')
                         setCard(
                             res.data.uid,
                             1,
-                            `${
-                                reasonString[res.data.reason]
-                            } / ${res.data.result.map((x) => x + 0)}`
+                            `${res.data.reason}`,
+                            `<div>
+                                <h2>#${pmp[res.data.uid]}</h2>
+                                <h4>UID</h4>
+                                <p>${res.data.uid}</p>
+                                <h4>Result</h4>
+                                <p>${reasonString[res.data.reason]}</p>
+                                <h4>Scoring</h4>
+                                <p>${res.data.result}</p>
+                                <h4>Message</h4>
+                                <p>${res.data.message}</p>
+                             </div>`
                         )
                     if (res.type === 'JUDGE_PROGRESS')
                         setCard(
                             res.data.uid,
                             res.data.progress,
-                            reasonString[res.data.reason]
+                            res.data.reason,
+                            `<div>
+                                <h2>#${pmp[res.data.uid]}</h2>
+                                <h4>UID</h4>
+                                <p>${res.data.uid}</p>
+                                <h4>State</h4>
+                                <p>${reasonString[res.data.reason]}</p>
+                             </div>`
                         )
                     if (res.type === 'JUDGE_STATUS') {
                         for (let i of res.data.waitList) {
-                            setCard(i, 0, reasonString['PD'])
+                            setCard(
+                                i,
+                                0,
+                                'PD',
+                                `<div>
+                                <h2>#${i}</h2>
+                                <h4>UID</h4>
+                                <p>${res.data.uid}</p>
+                                <h4>State</h4>
+                                <p>${reasonString[res.data.reason]}</p>
+                             </div>`
+                            )
                         }
                     }
                 }
@@ -151,14 +201,19 @@
                 })
             }
 
-            function setCard(id, progress, reason = '') {
+            function setCard(id, progress, reason = '', detail = '') {
                 let card = document.getElementById(`card-${id}`)
                 if (!card) card = addCard(id)
                 if (progress === 1) card.classList.add('success')
-                document.getElementById(`subtitle-${id}`).innerText = reason
+                document.getElementById(`subtitle-${id}`).innerText = reasonString[reason]
                 setTimeout(() => {
                     mdcProgress[id].foundation.setProgress(progress)
                 }, 1)
+                card.className = 'mdc-card mdc-card--outlined card ' + reason
+                card.onclick = () => {
+                    document.getElementById('dialogBody').innerHTML = detail
+                    dialog.open()
+                }
             }
 
             function addCard(id) {
@@ -166,6 +221,8 @@
                 let title = document.createElement('h2')
                 let subTitle = document.createElement('h4')
                 let progress = document.createElement('div')
+                let body = document.createElement('div')
+                let ripple = document.createElement('div')
                 progress.className = 'mdc-linear-progress'
                 progress.id = `progress-${id}`
                 progress.innerHTML = `<div class="mdc-linear-progress__buffer">
@@ -178,15 +235,23 @@
             <div class="mdc-linear-progress__bar mdc-linear-progress__secondary-bar">
               <span class="mdc-linear-progress__bar-inner"></span>
             </div>`
-                title.innerText = `#${judgeNo++}`
+                const jid = judgeNo++
+                pmp[id] = jid
+                title.innerText = `#${jid}`
                 subTitle.innerText = id
                 subTitle.id = `subtitle-${id}`
                 card.id = `card-${id}`
-                card.append(title)
-                card.append(subTitle)
-                card.append(progress)
+
+                body.className = 'mdc-card__primary-action'
+                ripple.className = 'mdc-card__ripple'
+                body.append(title)
+                body.append(subTitle)
+                body.append(progress)
+                body.append(ripple)
+                card.append(body)
                 card.className = 'mdc-card mdc-card--outlined card'
                 document.querySelector('.container').prepend(card)
+                mdc.ripple.MDCRipple.attachTo(body)
                 const linearProgress = new mdc.linearProgress.MDCLinearProgress(
                     document.getElementById(`progress-${id}`)
                 )
@@ -220,14 +285,19 @@
                                 { input: '-2 -4', output: '-6' },
                             ],
                         },
-                        timeLimit: 0,
-                        memoryLimit: 0,
+                        timeLimit: 1000,
+                        memoryLimit: 10,
                     }),
                 })
             }
 
             function hard() {
-                for (let i = 0; i < 500; i++) test()
+                for (
+                    let i = 0;
+                    i < parseInt(document.getElementById('loadCount').value);
+                    i++
+                )
+                    test()
             }
 
             document.addEventListener('DOMContentLoaded', () => {
@@ -254,6 +324,13 @@
                         ).style.display = 'none'
                     }
                 }, 100)
+                for (const i of document.querySelectorAll('.mdc-text-field'))
+                    new mdc.textField.MDCTextField(i)
+                for (const i of document.querySelectorAll('.ripple'))
+                    new mdc.ripple.MDCRipple(i)
+                dialog = new mdc.dialog.MDCDialog(
+                    document.querySelector('.mdc-dialog')
+                )
             })
         </script>
         <header class="mdc-top-app-bar">
@@ -292,21 +369,39 @@
                     </span>
                 </label>
                 <button
-                    class="mdc-button mdc-button--outlined"
+                    class="mdc-button mdc-button--outlined ripple"
                     onclick="test()"
                 >
                     <span class="mdc-button__ripple"></span>
                     Request Test Judgement
                 </button>
                 <button
-                    class="mdc-button mdc-button--outlined"
+                    class="mdc-button mdc-button--outlined ripple"
                     onclick="hard()"
                 >
                     <span class="mdc-button__ripple"></span>
                     Load Test
                 </button>
+                <label class="mdc-text-field mdc-text-field--outlined">
+                    <span class="mdc-notched-outline">
+                        <span class="mdc-notched-outline__leading"></span>
+                        <span class="mdc-notched-outline__notch">
+                            <span class="mdc-floating-label" id="my-label-id"
+                                >Count</span
+                            >
+                        </span>
+                        <span class="mdc-notched-outline__trailing"></span>
+                    </span>
+                    <input
+                        type="text"
+                        class="mdc-text-field__input"
+                        aria-labelledby="my-label-id"
+                        id="loadCount"
+                        value="500"
+                    />
+                </label>
                 <div
-                    class="mdc-card mdc-card--outlined card"
+                    class="mdc-card mdc-card--outlined card simple"
                     id="connection-error"
                     style="display: none"
                 >
@@ -316,5 +411,29 @@
             </div>
             <div class="container"></div>
         </main>
+        <div class="mdc-dialog">
+            <div class="mdc-dialog__container">
+                <div
+                    class="mdc-dialog__surface"
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-labelledby="my-dialog-title"
+                    aria-describedby="my-dialog-content"
+                >
+                    <div class="mdc-dialog__content" id="dialogBody"></div>
+                    <div class="mdc-dialog__actions">
+                        <button
+                            type="button"
+                            class="mdc-button mdc-dialog__button"
+                            data-mdc-dialog-action="cancel"
+                        >
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">Close</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
     </body>
 </html>

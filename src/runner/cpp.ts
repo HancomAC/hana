@@ -5,8 +5,12 @@ import {
     JudgeType,
 } from '../types/request'
 import { sendMessage } from '../socket'
-import { JudgeResult, WebSocketResponseType } from '../types/response'
-import { execute, isSame } from './index'
+import {
+    JudgeResult,
+    JudgeResultCode,
+    WebSocketResponseType,
+} from '../types/response'
+import { execute, isSame, ResultType } from './index'
 import * as fs from 'fs'
 import { execSync } from 'child_process'
 
@@ -18,7 +22,9 @@ export default function (
     >
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
-        let match = Array(data.dataSet.data.length).fill(false)
+        let match = Array(data.dataSet.data.length).fill(false),
+            judgeResult = 'AC' as JudgeResultCode,
+            message = ''
         const tmpPath = '/tmp/' + data.uid
         const exePath = tmpPath + '/main'
 
@@ -28,9 +34,12 @@ export default function (
             reason: 'CP',
         })
 
-        execSync(`adduser --disabled-password --no-create-home p-${data.uid}`, {
-            stdio: 'ignore',
-        })
+        execSync(
+            `adduser -g execute --disabled-password --no-create-home p-${data.uid}`,
+            {
+                stdio: 'ignore',
+            }
+        )
 
         fs.mkdirSync(tmpPath)
         execSync(`chmod 777 ${tmpPath}`, { stdio: 'ignore' })
@@ -64,13 +73,35 @@ export default function (
         })
 
         for (const i in data.dataSet.data) {
-            const result = await execute(
+            const { code, stdout, stderr, resultType } = await execute(
                 `p-${data.uid}`,
-                exePath,
-                data.dataSet.data[i].input
+                `ulimit -m ${data.memoryLimit * 1024};ulimit -v ${
+                    data.memoryLimit * 1024
+                };ulimit -n 2;cpulimit -l 6 -- time -v ${exePath}`,
+                data.dataSet.data[i].input,
+                data.timeLimit || 1
             )
-            if (isSame(result.stdout, data.dataSet.data[i].output))
-                match[i] = true
+            if (code) {
+                let errorMsg = ''
+                switch (resultType) {
+                    case ResultType.normal:
+                        errorMsg = stderr.split('\n').slice(0, -23).join('\n')
+                        if (judgeResult === 'AC')
+                            judgeResult = 'RE' as JudgeResultCode
+                        break
+                    case ResultType.timeLimitExceeded:
+                        errorMsg = stderr
+                        judgeResult = 'TLE' as JudgeResultCode
+                }
+                if (!message) message = errorMsg
+            } else {
+                const errorMsg = stderr.split('\n').slice(0, -23).join('\n')
+                const info = stderr.split('\n').slice(-23).join('\n')
+                const memUsage = info.match(/max resident set size: (\d+)/)?.[1]
+                if (isSame(stdout, data.dataSet.data[i].output)) match[i] = true
+                else if (judgeResult === 'AC')
+                    judgeResult = 'WA' as JudgeResultCode
+            }
             sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                 uid: data.uid,
                 progress: (i as unknown as number) / data.dataSet.data.length,
@@ -82,10 +113,10 @@ export default function (
         resolve({
             uid: data.uid,
             result: match,
-            reason:
-                match.reduce((a, b) => a + b, 0) === match.length ? 'AC' : 'WA',
+            reason: judgeResult,
             time: 0,
             memory: 0,
+            message: message,
         })
     })
 }

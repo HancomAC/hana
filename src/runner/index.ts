@@ -11,35 +11,80 @@ import judgeCPP from './cpp'
 import { JudgeResult } from '../types/response'
 import { spawn } from 'child_process'
 
-export function execute(userName: string, exePath: string, input: string) {
-    return new Promise<{ code: number; stdout: string; stderr: string }>(
-        (resolve, reject) => {
-            const child = spawn(`su`, [userName, '-c', exePath], {
-                stdio: ['pipe', 'pipe', 'pipe'],
-            })
-            try {
-                child.stdin.write(input)
-            } catch (e) {}
-            try {
-                child.stdin.end()
-            } catch (e) {}
+export const enum ResultType {
+    normal,
+    timeLimitExceeded,
+    stdioError,
+}
 
-            let stdout = '',
-                stderr = ''
-
-            child.stdout.on('data', (data: any) => {
-                stdout += data
+export function execute(
+    userName: string,
+    exePath: string,
+    input?: string,
+    timeout?: number
+) {
+    return new Promise<{
+        resultType: ResultType
+        code: number
+        stdout: string
+        stderr: string
+    }>((resolve) => {
+        const child = spawn(`su`, [userName, '-c', exePath], {
+            stdio: ['pipe', 'pipe', 'pipe'],
+        })
+        child.stdin.on('error', (err) => {
+            resolve({
+                resultType: ResultType.stdioError,
+                code: -1,
+                stdout: '',
+                stderr: '',
             })
-
-            child.stderr.on('data', (data: any) => {
-                stderr += data
+        })
+        child.on('error', (err) => {
+            resolve({
+                resultType: ResultType.stdioError,
+                code: -1,
+                stdout: '',
+                stderr: '',
             })
+        })
 
-            child.on('close', (code) => {
-                resolve({ code: code || 0, stdout, stderr })
+        let timeHandler: NodeJS.Timeout
+        if (timeout)
+            timeHandler = setTimeout(() => {
+                child.kill()
+                resolve({
+                    resultType: ResultType.timeLimitExceeded,
+                    code: -1,
+                    stdout: '',
+                    stderr: 'Time Limit Exceed',
+                })
+            }, timeout)
+
+        child.stdin.write(input || '')
+        child.stdin.end()
+
+        let stdout = '',
+            stderr = ''
+
+        child.stdout.on('data', (data: any) => {
+            stdout += data
+        })
+
+        child.stderr.on('data', (data: any) => {
+            stderr += data
+        })
+
+        child.on('close', (code) => {
+            if (timeHandler) clearTimeout(timeHandler)
+            resolve({
+                resultType: ResultType.normal,
+                code: code || 0,
+                stdout,
+                stderr,
             })
-        }
-    )
+        })
+    })
 }
 
 export function isSame(in1: string, in2: string): boolean {

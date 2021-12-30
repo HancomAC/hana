@@ -5,7 +5,7 @@ import {
     OutputOnly,
 } from '../types/request'
 import { sendMessage } from '../socket'
-import {JudgeResult, WebSocketResponseType} from '../types/response'
+import { JudgeResult, WebSocketResponseType } from '../types/response'
 import { isSame } from './index'
 
 export default function (
