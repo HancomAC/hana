@@ -67,11 +67,20 @@ export default function (data: JudgeRequest): Promise<JudgeResult> {
                         >
                     )
             }
+            return Promise.resolve({
+                uid: data.uid,
+                result: Array(data.dataSet.data.length).fill(false),
+                reason: 'CE',
+                message: 'Unknown language',
+                time: 0,
+                memory: 0,
+            })
     }
     return Promise.resolve({
         uid: data.uid,
         result: Array(data.dataSet.data.length).fill(false),
         reason: 'CE',
+        message: 'Unknown judge type',
         time: 0,
         memory: 0,
     })
