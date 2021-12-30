@@ -8,6 +8,7 @@ import {
 import { JudgeResult } from '../types/response'
 
 import judgeText from './text'
+import judgeC from './c'
 import judgeCPP from './cpp'
 import judgePython3 from './python3'
 import judgePypy3 from './pypy3'
@@ -25,6 +26,14 @@ export default function (data: JudgeRequest): Promise<JudgeResult> {
             )
         case JudgeType.CommonJudge:
             switch (data.language) {
+                case JudgeSourceType.C:
+                    return judgeC(
+                        data as JudgeRequest<
+                            JudgeType.CommonJudge,
+                            JudgeSourceType.C,
+                            CommonDataSet
+                        >
+                    )
                 case JudgeSourceType.CPP:
                     return judgeCPP(
                         data as JudgeRequest<
