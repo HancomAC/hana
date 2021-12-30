@@ -42,6 +42,8 @@ export function execute(
 
         let timeHandler: NodeJS.Timeout,
             timeouted = false
+
+
         if (timeout)
             timeHandler = setTimeout(() => {
                 timeouted = true

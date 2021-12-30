@@ -70,6 +70,7 @@ export default function (
             reason: 'RUN',
         })
 
+        await executeJudge(data, exePath, '')
         for (const i in data.dataSet.data) {
             const { code, stdout, stderr, resultType } = await executeJudge(
                 data,
@@ -90,7 +91,9 @@ export default function (
                 }
                 if (!message) message = errorMsg
             } else {
-                const info = stderr.split('\n').slice(-2)[0]
+                let info = '',
+                    err = stderr.split('\n')
+                while (!info.includes('|') && err.length) info = err.pop() || ''
                 const timeUsage =
                     parseFloat(info.split('m ')[1].split('s')[0]) * 1000
                 const memUsage = parseInt(info.split('|')[1])
