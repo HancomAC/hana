@@ -97,7 +97,7 @@ export function isSame(in1: string, in2: string): boolean {
 }
 
 export function getTmpPath(uid: string) {
-    return '/tmp/' + uid
+    return '/tmp/HANA/' + uid
 }
 
 export function initTempEnv(uid: string, sources: SourceFile[]) {
@@ -108,7 +108,7 @@ export function initTempEnv(uid: string, sources: SourceFile[]) {
             stdio: 'ignore',
         }
     )
-    fs.mkdirSync(tmpPath)
+    fs.mkdirSync(tmpPath, { recursive: true })
     execSync(`chmod 777 ${tmpPath}`, { stdio: 'ignore' })
 
     for (const i of sources) fs.writeFileSync(tmpPath + '/' + i.name, i.source)
