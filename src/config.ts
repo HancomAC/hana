@@ -1,1 +1,1 @@
-export const MultiJudgeCount = 20
+export const MultiJudgeCount = 5

@@ -8,18 +8,20 @@ export const enum ResultType {
     stdioError,
 }
 
+export interface ExecuteResult {
+    resultType: ResultType
+    stdout: string
+    stderr: string
+    code: number
+}
+
 export function execute(
     userName: string,
     exePath: string,
     input?: string,
     timeout?: number
 ) {
-    return new Promise<{
-        resultType: ResultType
-        code: number
-        stdout: string
-        stderr: string
-    }>((resolve) => {
+    return new Promise<ExecuteResult>((resolve) => {
         const child = spawn(`su`, [userName, '-c', exePath], {
             stdio: ['pipe', 'pipe', 'pipe'],
         })
@@ -42,7 +44,6 @@ export function execute(
 
         let timeHandler: NodeJS.Timeout,
             timeouted = false
-
 
         if (timeout)
             timeHandler = setTimeout(() => {
