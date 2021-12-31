@@ -55,7 +55,7 @@ export function execute(
                     stdout: '',
                     stderr: 'Time Limit Exceed',
                 })
-            }, timeout)
+            }, timeout + 1000)
 
         child.stdin.write(input || '')
         child.stdin.end()
