@@ -12,6 +12,7 @@ import {
     executeJudge,
     clearTempEnv,
     ExecuteResult,
+    getTmpPath,
 } from './util'
 
 export default function commonJudge(
@@ -46,7 +47,9 @@ export default function commonJudge(
                     reason: 'CE',
                     time: 0,
                     memory: 0,
-                    message: buildResult.stderr,
+                    message: buildResult.stderr
+                        .replaceAll(getTmpPath(data.uid), '~')
+                        .replaceAll(`/p-${data.uid}`, ''),
                 })
                 return
             }
@@ -77,7 +80,7 @@ export default function commonJudge(
                         judgeResult = 'TLE' as JudgeResultCode
                 }
                 if (!message)
-                    message = errorMsg.replaceAll(`/tmp/${data.uid}`, '~')
+                    message = errorMsg.replaceAll(getTmpPath(data.uid), '~')
             } else {
                 let info = '',
                     err = stderr.split('\n')
