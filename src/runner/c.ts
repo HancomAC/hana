@@ -10,9 +10,9 @@ export default function (data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `gcc ${path}/Main.c -o ${path}/main -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE`
+                    `gcc ${path}/Main.c -o ${path}/Main -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE`
                 )
             ),
-        (path) => path + '/main'
+        (path) => path + '/Main'
     )
 }

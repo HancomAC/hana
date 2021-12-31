@@ -13,6 +13,7 @@ import judgeCPP from './cpp'
 import judgePython3 from './python3'
 import judgePypy3 from './pypy3'
 import judgeJava from './java'
+import judgeRust from './rust'
 
 export default function (data: JudgeRequest): Promise<JudgeResult> {
     switch (data.judgeType) {
@@ -27,45 +28,17 @@ export default function (data: JudgeRequest): Promise<JudgeResult> {
         case JudgeType.CommonJudge:
             switch (data.language) {
                 case JudgeSourceType.C:
-                    return judgeC(
-                        data as JudgeRequest<
-                            JudgeType.CommonJudge,
-                            JudgeSourceType.C,
-                            CommonDataSet
-                        >
-                    )
+                    return judgeC(data)
                 case JudgeSourceType.CPP:
-                    return judgeCPP(
-                        data as JudgeRequest<
-                            JudgeType.CommonJudge,
-                            JudgeSourceType.CPP,
-                            CommonDataSet
-                        >
-                    )
+                    return judgeCPP(data)
                 case JudgeSourceType.PYTHON3:
-                    return judgePython3(
-                        data as JudgeRequest<
-                            JudgeType.CommonJudge,
-                            JudgeSourceType.PYTHON3,
-                            CommonDataSet
-                        >
-                    )
+                    return judgePython3(data)
                 case JudgeSourceType.PYPY3:
-                    return judgePypy3(
-                        data as JudgeRequest<
-                            JudgeType.CommonJudge,
-                            JudgeSourceType.PYPY3,
-                            CommonDataSet
-                        >
-                    )
+                    return judgePypy3(data)
                 case JudgeSourceType.JAVA:
-                    return judgeJava(
-                        data as JudgeRequest<
-                            JudgeType.CommonJudge,
-                            JudgeSourceType.JAVA,
-                            CommonDataSet
-                        >
-                    )
+                    return judgeJava(data)
+                case JudgeSourceType.RUST:
+                    return judgeRust(data)
             }
             return Promise.resolve({
                 uid: data.uid,

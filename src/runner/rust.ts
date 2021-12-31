@@ -7,10 +7,10 @@ export default function (data: JudgeRequest) {
         data,
         (path) =>
             execute(
-                `p-${data.uid}`,
+                `root`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `g++ ${path}/Main.cpp -o ${path}/Main -O2 -Wall -lm --static -pipe -std=c++17 -DONLINE_JUDGE`
+                    `rustc ${path}/Main.rs`
                 )
             ),
         (path) => path + '/Main'

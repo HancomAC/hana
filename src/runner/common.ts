@@ -20,7 +20,7 @@ export default function commonJudge(
     getExePath: (path: string) => string
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
-        let match = Array(data.dataSet.data.length).fill(0),
+        let result = Array(data.dataSet.data.length).fill(0),
             judgeResult = 'AC' as JudgeResultCode,
             message = ''
 
@@ -42,7 +42,7 @@ export default function commonJudge(
                 clearTempEnv(data.uid)
                 resolve({
                     uid: data.uid,
-                    result: match,
+                    result,
                     reason: 'CE',
                     time: 0,
                     memory: 0,
@@ -88,7 +88,7 @@ export default function commonJudge(
                 maxTimeUsage = Math.max(maxTimeUsage, timeUsage)
                 maxMemoryUsage = Math.max(maxMemoryUsage, memUsage)
                 if (isSame(stdout, data.dataSet.data[i].output))
-                    match[i as any] = 1
+                    result[i as any] = 1
                 else if (judgeResult === 'AC')
                     judgeResult = 'WA' as JudgeResultCode
             }
@@ -101,11 +101,11 @@ export default function commonJudge(
         clearTempEnv(data.uid)
         resolve({
             uid: data.uid,
-            result: match,
+            result,
             reason: judgeResult,
             time: maxTimeUsage,
             memory: maxMemoryUsage,
-            message: message,
+            message,
         })
     })
 }
