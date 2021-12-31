@@ -18,12 +18,13 @@ export interface ExecuteResult {
 export function execute(
     userName: string,
     exePath: string,
-    input?: string,
-    timeout?: number
+    option: { input?: string; timeout?: number; cwd?: string } = {}
 ) {
+    option = Object.assign({ input: '', timeout: 0, cwd: '' }, option)
     return new Promise<ExecuteResult>((resolve) => {
         const child = spawn(`su`, [userName, '-c', exePath], {
             stdio: ['pipe', 'pipe', 'pipe'],
+            ...(option.cwd ? { cwd: option.cwd } : {}),
         })
         child.stdin.on('error', () => {
             resolve({
@@ -45,7 +46,7 @@ export function execute(
         let timeHandler: NodeJS.Timeout,
             timeouted = false
 
-        if (timeout)
+        if (option.timeout)
             timeHandler = setTimeout(() => {
                 timeouted = true
                 child.kill()
@@ -55,9 +56,9 @@ export function execute(
                     stdout: '',
                     stderr: 'Time Limit Exceed',
                 })
-            }, timeout + 1000)
+            }, option.timeout + 1000)
 
-        child.stdin.write(input || '')
+        child.stdin.write(option.input || '')
         child.stdin.end()
 
         let stdout = '',
@@ -109,7 +110,7 @@ export function initTempEnv(uid: string, sources: SourceFile[]) {
         }
     )
     fs.mkdirSync(tmpPath, { recursive: true })
-    execSync(`chmod 777 ${tmpPath}`, { stdio: 'ignore' })
+    execSync(`chown p-${uid} ${tmpPath}`, { stdio: 'ignore' })
 
     for (const i of sources) fs.writeFileSync(tmpPath + '/' + i.name, i.source)
     return tmpPath
@@ -145,7 +146,6 @@ export function executeJudge(
             { memoryLimit: data.memoryLimit, cpuLimit: 10 },
             `/usr/bin/time -f "%E|%M" ${exePath}`
         ),
-        input,
-        data.timeLimit || 1
+        { input, timeout: data.timeLimit || 0, cwd: getTmpPath(data.uid) }
     )
 }

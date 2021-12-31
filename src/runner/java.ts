@@ -10,6 +10,6 @@ export default function (data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString({ cpuLimit: 50 }, `javac ${path}/Main.java`)
             ),
-        (path) => `java -cp ${path} Main`
+        (path) => `java -verbose -cp ${path} Main`
     )
 }

@@ -8,7 +8,8 @@ export default function (data: JudgeRequest) {
         (path) =>
             execute(
                 `p-${data.uid}`,
-                getLimitString({ cpuLimit: 50 }, `rustc ${path}/Main.rs`)
+                getLimitString({ cpuLimit: 50 }, `rustc ${path}/Main.rs`),
+                { cwd: path }
             ),
         (path) => path + '/Main'
     )

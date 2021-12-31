@@ -10,7 +10,7 @@ export default function (data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `python3 -m compileall -b ${path}`,
+                    `python3 -m compileall -b ${path}`
                 )
             ),
         (path) => `python3 ${path}/Main.py`
