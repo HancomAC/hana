@@ -146,6 +146,65 @@
                 RUST: 'rs',
             }
 
+            const exampleCode = {
+                C: `#include <stdio.h>
+int main(){
+    int a,b;
+    while(scanf("%d %d",&a, &b) != EOF)
+        printf("%d\\n",a+b);
+ return 0;
+}`,
+                CPP: `#include <iostream>
+using namespace std;
+int main(){
+    int a,b;
+    while(cin >> a >> b)
+        cout << a+b << endl;
+ return 0;
+}`,
+                JAVA: `import java.util.*;
+public class Main{
+   public static void main(String args[]){
+       Scanner cin = new Scanner(System.in);
+       int a, b;
+       while (cin.hasNext()){
+           a = cin.nextInt(), b = cin.nextInt();
+           System.out.println(a + b);
+      }
+   }
+}`,
+                PYTHON3: `a, b = map(int, input().split())
+print(a + b)`,
+                PYPY3: `a, b = map(int, input().split())
+print(a + b)`,
+                RUST: `use std::io;
+
+fn main() {
+    let mut input_number = String::new();
+
+    io::stdin().read_line(&mut input_number)
+        .expect("Falied to read line");
+
+    let numbers: Vec<&str> = input_number.split_whitespace().collect();
+
+    let number_a = match numbers[0].parse::<i32>() {
+        Ok(i) => i,
+        Err(_e) => {
+            -1
+        }
+    };
+
+    let number_b = match numbers[1].parse::<i32>() {
+        Ok(i) => i,
+        Err(_e) => {
+            -1
+        }
+    };
+
+    println!("{}", number_a + number_b);
+}`,
+            }
+
             function connectWs() {
                 try {
                     tws = new WebSocket('ws://' + window.location.host)
@@ -347,6 +406,14 @@
                 select = new mdc.select.MDCSelect(
                     document.querySelector('.mdc-select')
                 )
+                document
+                    .querySelector('.mdc-select')
+                    .addEventListener('MDCSelect:change', function (a) {
+                        try {
+                            document.getElementById('source').value =
+                                exampleCode[select.selectedText.innerText]
+                        } catch (e) {}
+                    })
             })
         </script>
         <header class="mdc-top-app-bar">

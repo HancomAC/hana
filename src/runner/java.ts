@@ -8,7 +8,8 @@ export default function (data: JudgeRequest) {
         (path) =>
             execute(
                 `p-${data.uid}`,
-                getLimitString({ cpuLimit: 50 }, `javac ${path}/Main.java`)
+                getLimitString({ cpuLimit: 50 }, `javac ${path}/Main.java`),
+                { cwd: path }
             ),
         (path) => `java -verbose -cp ${path} Main`
     )
