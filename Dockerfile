@@ -36,6 +36,13 @@ RUN java -version
 RUN apk add rust
 RUN rustc --version
 
+# Install Go
+RUN apk add go
+RUN mkdir /tmp/gocache
+RUN chmod 777 /tmp/gocache
+ENV GOROOT /usr/lib/go
+ENV GOCACHE /tmp/gocache
+ENV PATH /go/bin:$PATH
 
 # Copy files & Install requirements
 RUN addgroup execute

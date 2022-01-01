@@ -1,5 +1,4 @@
 import {
-    CommonDataSet,
     JudgeRequest,
     JudgeSourceType,
     JudgeType,
@@ -14,6 +13,7 @@ import judgePython3 from './python3'
 import judgePypy3 from './pypy3'
 import judgeJava from './java'
 import judgeRust from './rust'
+import judgeGo from './golang'
 
 export default function (data: JudgeRequest): Promise<JudgeResult> {
     switch (data.judgeType) {
@@ -39,6 +39,8 @@ export default function (data: JudgeRequest): Promise<JudgeResult> {
                     return judgeJava(data)
                 case JudgeSourceType.RUST:
                     return judgeRust(data)
+                case JudgeSourceType.GO:
+                    return judgeGo(data)
             }
             return Promise.resolve({
                 uid: data.uid,

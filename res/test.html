@@ -137,6 +137,15 @@
                 CP: 'Compiling',
                 RUN: 'Running',
             }
+            const supportedLanguages = [
+                'C',
+                'CPP',
+                'PYTHON3',
+                'PYPY3',
+                'JAVA',
+                'RUST',
+                'GO',
+            ]
             const ext = {
                 PYTHON3: 'py',
                 PYPY3: 'py',
@@ -144,6 +153,7 @@
                 C: 'c',
                 JAVA: 'java',
                 RUST: 'rs',
+                GO: 'go',
             }
 
             const exampleCode = {
@@ -202,6 +212,17 @@ fn main() {
     };
 
     println!("{}", number_a + number_b);
+}`,
+                GO: `package main
+
+import (
+\t"fmt"
+)
+
+func main() {
+\tvar a, b int
+\tfmt.Scanf("%d %d", &a, &b)
+\tfmt.Println(a+b)
 }`,
             }
 
@@ -358,7 +379,7 @@ fn main() {
                             ],
                         },
                         timeLimit: 2000,
-                        memoryLimit: 100,
+                        memoryLimit: 1000,
                     }),
                 })
             }
@@ -373,6 +394,17 @@ fn main() {
             }
 
             document.addEventListener('DOMContentLoaded', () => {
+                for (let i of supportedLanguages) {
+                    document.getElementById('supportedLang').innerHTML += `<li
+                                class="mdc-list-item ripple"
+                                aria-selected="false"
+                                data-value="${i}"
+                                role="option"
+                            >
+                                <span class="mdc-list-item__ripple"></span>
+                                <span class="mdc-list-item__text">${i}</span>
+                            </li>`
+                }
                 setInterval(() => {
                     if (document.documentElement.scrollTop)
                         document
@@ -482,64 +514,7 @@ fn main() {
                     <div
                         class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth"
                     >
-                        <ul class="mdc-list">
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="C"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text"> C </span>
-                            </li>
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="CPP"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text"> CPP </span>
-                            </li>
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="PYTHON3"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text">
-                                    PYTHON3
-                                </span>
-                            </li>
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="PYPY3"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text"> PYPY3 </span>
-                            </li>
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="JAVA"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text"> JAVA </span>
-                            </li>
-                            <li
-                                class="mdc-list-item ripple"
-                                aria-selected="false"
-                                data-value="RUST"
-                                role="option"
-                            >
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text"> RUST </span>
-                            </li>
-                        </ul>
+                        <ul class="mdc-list" id="supportedLang"></ul>
                     </div>
                 </div>
                 <label
