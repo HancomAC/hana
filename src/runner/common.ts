@@ -106,7 +106,7 @@ export default function commonJudge(
             uid: data.uid,
             result,
             reason: judgeResult,
-            time: maxTimeUsage,
+            time: Math.round(maxTimeUsage),
             memory: maxMemoryUsage,
             message,
         })

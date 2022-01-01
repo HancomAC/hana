@@ -127,11 +127,7 @@ export function getLimitString(
     command: string
 ) {
     return `${
-        limit.memoryLimit
-            ? `ulimit -m ${limit.memoryLimit * 1024};ulimit -v ${
-                  limit.memoryLimit * 1024
-              };`
-            : ''
+        limit.memoryLimit ? `ulimit -v ${limit.memoryLimit * 1024};` : ''
     }${limit.cpuLimit ? `cpulimit -i -l ${limit.cpuLimit} -- ` : ''}${command}`
 }
 

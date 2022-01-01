@@ -174,14 +174,13 @@ int main(){
 }`,
                 JAVA: `import java.util.*;
 public class Main{
-   public static void main(String args[]){
-       Scanner cin = new Scanner(System.in);
-       int a, b;
-       while (cin.hasNext()){
-           a = cin.nextInt(), b = cin.nextInt();
-           System.out.println(a + b);
-      }
-   }
+\tpublic static void main(String args[]){
+\t\tScanner sc = new Scanner(System.in);
+\t\tint a, b;
+\t\ta = sc.nextInt();
+\t\tb = sc.nextInt();
+\t\tSystem.out.println(a + b);
+\t}
 }`,
                 PYTHON3: `a, b = map(int, input().split())
 print(a + b)`,
@@ -379,7 +378,7 @@ func main() {
                             ],
                         },
                         timeLimit: 2000,
-                        memoryLimit: 1000,
+                        memoryLimit: 512,
                     }),
                 })
             }

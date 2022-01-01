@@ -8,9 +8,9 @@ export default function (data: JudgeRequest) {
         (path) =>
             execute(
                 `p-${data.uid}`,
-                getLimitString({ cpuLimit: 50 }, `javac ${path}/Main.java`),
+                getLimitString({ cpuLimit: 50 }, `javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 ${path}/Main.java`),
                 { cwd: path }
             ),
-        (path) => `java -verbose -cp ${path} Main`
+        (path) => `java -Xms64m -Xmx512m -Xss64m -Dfile.encoding=UTF-8 -XX:+UseSerialGC -DONLINE_JUDGE=1 Main`
     )
 }
