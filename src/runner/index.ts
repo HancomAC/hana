@@ -1,7 +1,4 @@
-import {
-    JudgeRequest,
-    JudgeType,
-} from '../types/request'
+import { JudgeRequest, JudgeType } from '../types/request'
 import { JudgeResult } from '../types/response'
 import * as fs from 'fs'
 import * as path from 'path'
