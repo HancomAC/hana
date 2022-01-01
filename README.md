@@ -3,6 +3,7 @@
 <h1 align="center">HANA</h1>
 
 [![Build Status](https://github.com/HancomAC/HANA/actions/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/HancomAC/HANA/actions/workflows/ci.yml)
+[![CodqQL Analysis Status](https://github.com/HancomAC/HANA/actions/workflows/.github/workflows/codeql.yml/badge.svg)](https://github.com/HancomAC/HANA/actions/workflows/codeql.yml)
 
 HANA is a PS Judgement Server that runs on Docker.
 
