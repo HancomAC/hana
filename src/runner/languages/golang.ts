@@ -8,7 +8,7 @@ export function judge(data: JudgeRequest) {
         (path) =>
             execute(
                 `p-${data.uid}`,
-                getLimitString({ cpuLimit: 50 }, `go build ${path}/Main.go`),
+                getLimitString({ cpuLimit: 50 }, `go build Main.go`),
                 { cwd: path }
             ),
         (path) => path + '/Main'

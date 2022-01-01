@@ -6,45 +6,59 @@ HANA is a PS Judgement Server that runs on Docker.
 
 ## Supported Languages
 
-C, C++, Go, Java, Python3, Pypy3, Rust, Text
+C, C++, Go, Java, Python3, Pypy3, Rust, Text, JavaScript, TypeScript
 
 <details>
 <summary>Build option</summary>
 
-* C
+-   C
+
 ```shell
-gcc ${path}/Main.c -o ${path}/Main -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE
+gcc Main.c -o Main -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE
 ```
 
-* C++
+-   C++
+
 ```shell
-g++ ${path}/Main.cpp -o ${path}/Main -O2 -Wall -lm --static -pipe -std=c++17 -DONLINE_JUDGE
+g++ Main.cpp -o Main -O2 -Wall -lm --static -pipe -std=c++17 -DONLINE_JUDGE
 ```
 
-* Go
+-   Go
+
 ```shell
-go build ${path}/Main.go
+go build Main.go
 ```
 
-* Java
+-   Java
+
 ```shell
-javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 ${path}/Main.java
+javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 Main.java
 ```
 
-* Python3
+-   Python3
+
 ```shell
 python3 -m compileall -b ${path}
 ```
 
-* Pypy3
+-   Pypy3
+
 ```shell
 pypy3 -m compileall -b ${path}
 ```
 
-* Rust
+-   Rust
+
 ```shell
-rustc ${path}/Main.rs
+rustc Main.rs
 ```
+
+-   TypeScript
+
+```shell
+tsc Main.ts
+```
+
 </details>
 
 ## Installation

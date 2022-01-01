@@ -10,7 +10,7 @@ export function judge(data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 ${path}/Main.java`
+                    `javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 Main.java`
                 ),
                 { cwd: path }
             ),

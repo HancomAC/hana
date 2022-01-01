@@ -10,8 +10,9 @@ export function judge(data: JudgeRequest) {
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `g++ ${path}/Main.cpp -o ${path}/Main -O2 -Wall -lm --static -pipe -std=c++17 -DONLINE_JUDGE`
-                )
+                    `g++ Main.cpp -o Main -O2 -Wall -lm --static -pipe -std=c++17 -DONLINE_JUDGE`
+                ),
+                { cwd: path }
             ),
         (path) => path + '/Main'
     )

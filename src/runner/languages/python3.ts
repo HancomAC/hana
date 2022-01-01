@@ -11,7 +11,8 @@ export function judge(data: JudgeRequest) {
                 getLimitString(
                     { cpuLimit: 50 },
                     `python3 -m compileall -b ${path}`
-                )
+                ),
+                { cwd: path }
             )
             return {
                 resultType: ResultType.normal,

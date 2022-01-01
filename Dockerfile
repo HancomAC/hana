@@ -8,7 +8,7 @@ RUN apk update
 
 #Install node.js
 RUN apk add nodejs npm
-RUN npm install -g yarn
+RUN npm install -g yarn typescript
 RUN node --version
 RUN npm --version
 RUN yarn --version
@@ -51,5 +51,6 @@ COPY package.json yarn.lock /HANA/
 RUN yarn install --production
 COPY tsconfig.json /HANA/
 COPY res/ /HANA/res/
+COPY include/ /include/
 COPY dist/ /HANA/dist/
 CMD yarn run run

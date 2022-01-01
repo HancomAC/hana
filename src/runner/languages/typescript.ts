@@ -5,23 +5,34 @@ import commonJudge from '../common'
 export function judge(data: JudgeRequest) {
     return commonJudge(
         data,
-        (path) =>
-            execute(
+        async (path) => {
+            const res = await execute(
                 `p-${data.uid}`,
                 getLimitString(
                     { cpuLimit: 50 },
-                    `gcc Main.c -o Main -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE`
+                    `cp -a /include/TYPESCRIPT/. ${path}/;tsc Main.ts`
                 ),
                 { cwd: path }
-            ),
-        (path) => path + '/Main'
+            )
+            return {
+                resultType: res.resultType,
+                code: res.code,
+                stdout: '',
+                stderr: res.stdout + '\n' + res.stderr,
+            }
+        },
+        (path) => `node ${path}/Main.js`
     )
 }
 
 export function getLanguage() {
-    return JudgeSourceType.C
+    return JudgeSourceType.TYPESCRIPT
 }
 
 export function getSupportedType() {
     return [JudgeType.CommonJudge, JudgeType.Interactive]
+}
+
+export async function init() {
+    await execute('root', 'yarn', { cwd: '/include/TYPESCRIPT' })
 }

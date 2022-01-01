@@ -137,16 +137,7 @@
                 CP: 'Compiling',
                 RUN: 'Running',
             }
-            const supportedLanguages = [
-                'C',
-                'CPP',
-                'PYTHON3',
-                'PYPY3',
-                'JAVA',
-                'RUST',
-                'GO',
-            ]
-            const ext = {
+            const supportedLanguages = {
                 PYTHON3: 'py',
                 PYPY3: 'py',
                 CPP: 'cpp',
@@ -154,6 +145,8 @@
                 JAVA: 'java',
                 RUST: 'rs',
                 GO: 'go',
+                JAVASCRIPT: 'js',
+                TYPESCRIPT: 'ts',
             }
 
             const exampleCode = {
@@ -223,6 +216,18 @@ func main() {
 \tfmt.Scanf("%d %d", &a, &b)
 \tfmt.Println(a+b)
 }`,
+                JAVASCRIPT: `const fs = require('fs');
+const inputData = fs.readFileSync(0, 'utf8').toString().split(' ');
+
+const A = parseInt(inputData[0]);
+const B = parseInt(inputData[1]);
+
+console.log(A+B);`,
+                TYPESCRIPT: `import * as fs from 'fs'
+const input: string[] = fs.readFileSync(0).toString().split(' ');
+const a: number = parseInt(input[0]);
+const b: number = parseInt(input[1]);
+console.log(a+b);`,
             }
 
             function connectWs() {
@@ -365,7 +370,9 @@ func main() {
                             {
                                 name:
                                     'Main.' +
-                                    ext[select.selectedText.innerText],
+                                    supportedLanguages[
+                                        select.selectedText.innerText
+                                    ],
                                 source: document.getElementById('source').value,
                             },
                         ],
@@ -393,7 +400,7 @@ func main() {
             }
 
             document.addEventListener('DOMContentLoaded', () => {
-                for (let i of supportedLanguages) {
+                for (let i of Object.keys(supportedLanguages)) {
                     document.getElementById('supportedLang').innerHTML += `<li
                                 class="mdc-list-item ripple"
                                 aria-selected="false"

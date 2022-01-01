@@ -22,6 +22,7 @@ export const enum JudgeSourceType {
     PYPY3 = 'PYPY3',
     JAVA = 'JAVA',
     JAVASCRIPT = 'JAVASCRIPT',
+    TYPESCRIPT = 'TYPESCRIPT',
     GO = 'GO',
     RUST = 'RUST',
 }
