@@ -97,7 +97,7 @@ export default function commonJudge(
             }
             sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                 uid: data.uid,
-                progress: (i as any) / data.dataSet.data.length,
+                progress: (parseInt(i) + 1) / data.dataSet.data.length,
                 reason: 'RUN',
             })
         }

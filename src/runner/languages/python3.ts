@@ -1,8 +1,8 @@
-import { JudgeRequest } from '../types/request'
-import commonJudge from './common'
-import { execute, getLimitString, ResultType } from './util'
+import { JudgeRequest, JudgeSourceType, JudgeType } from '../../types/request'
+import commonJudge from '../common'
+import { execute, getLimitString, ResultType } from '../util'
 
-export default function (data: JudgeRequest) {
+export function judge(data: JudgeRequest) {
     return commonJudge(
         data,
         async (path) => {
@@ -22,4 +22,12 @@ export default function (data: JudgeRequest) {
         },
         (path) => `python3 ${path}/Main.py`
     )
+}
+
+export function getLanguage() {
+    return JudgeSourceType.PYTHON3
+}
+
+export function getSupportedType() {
+    return [JudgeType.CommonJudge, JudgeType.Interactive]
 }

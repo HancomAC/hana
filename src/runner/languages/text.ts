@@ -3,12 +3,12 @@ import {
     JudgeSourceType,
     JudgeType,
     OutputOnly,
-} from '../types/request'
-import { sendMessage } from '../socket'
-import { JudgeResult, WebSocketResponseType } from '../types/response'
-import { isSame } from './util'
+} from '../../types/request'
+import { sendMessage } from '../../socket'
+import { JudgeResult, WebSocketResponseType } from '../../types/response'
+import { isSame } from '../util'
 
-export default function (
+export function judge(
     data: JudgeRequest<JudgeType.OutputOnly, JudgeSourceType.TEXT, OutputOnly>
 ) {
     return new Promise<JudgeResult>((resolve) => {
@@ -36,4 +36,12 @@ export default function (
             memory: 0,
         })
     })
+}
+
+export function getLanguage() {
+    return JudgeSourceType.TEXT
+}
+
+export function getSupportedType() {
+    return [JudgeType.OutputOnly]
 }

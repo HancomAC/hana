@@ -11,6 +11,7 @@ export interface WebSocketRequest {
 export const enum JudgeType {
     CommonJudge = 'CommonJudge',
     OutputOnly = 'OutputOnly',
+    Interactive = 'Interactive',
 }
 
 export const enum JudgeSourceType {

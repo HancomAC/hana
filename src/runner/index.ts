@@ -1,59 +1,50 @@
 import {
     JudgeRequest,
-    JudgeSourceType,
     JudgeType,
-    OutputOnly,
 } from '../types/request'
 import { JudgeResult } from '../types/response'
+import * as fs from 'fs'
+import * as path from 'path'
 
-import judgeText from './text'
-import judgeC from './c'
-import judgeCPP from './cpp'
-import judgePython3 from './python3'
-import judgePypy3 from './pypy3'
-import judgeJava from './java'
-import judgeRust from './rust'
-import judgeGo from './golang'
+let importedLanguages: null | Map<
+    string,
+    {
+        getSupportedType: () => JudgeType[]
+        judge: (data: JudgeRequest) => Promise<JudgeResult>
+    }
+>
+
+function loadLanguages() {
+    importedLanguages = new Map()
+    const files = fs.readdirSync(path.join(__dirname, 'languages'))
+    files.forEach(async (file) => {
+        if (file.endsWith('.js')) {
+            const module: {
+                getLanguage: () => string
+                getSupportedType: () => JudgeType[]
+                judge: (data: JudgeRequest) => Promise<JudgeResult>
+            } = require(path.join(__dirname, 'languages', file))
+            importedLanguages?.set(module.getLanguage(), {
+                getSupportedType: module.getSupportedType,
+                judge: module.judge,
+            })
+        }
+    })
+}
 
 export default function (data: JudgeRequest): Promise<JudgeResult> {
-    switch (data.judgeType) {
-        case JudgeType.OutputOnly:
-            return judgeText(
-                data as JudgeRequest<
-                    JudgeType.OutputOnly,
-                    JudgeSourceType.TEXT,
-                    OutputOnly
-                >
-            )
-        case JudgeType.CommonJudge:
-            switch (data.language) {
-                case JudgeSourceType.C:
-                    return judgeC(data)
-                case JudgeSourceType.CPP:
-                    return judgeCPP(data)
-                case JudgeSourceType.PYTHON3:
-                    return judgePython3(data)
-                case JudgeSourceType.PYPY3:
-                    return judgePypy3(data)
-                case JudgeSourceType.JAVA:
-                    return judgeJava(data)
-                case JudgeSourceType.RUST:
-                    return judgeRust(data)
-                case JudgeSourceType.GO:
-                    return judgeGo(data)
-            }
-            return Promise.resolve({
-                uid: data.uid,
-                result: Array(data.dataSet.data.length).fill(false),
-                reason: 'CE',
-                message: 'Unknown language',
-                time: 0,
-                memory: 0,
-            })
+    if (!importedLanguages) {
+        loadLanguages()
+    }
+    if (importedLanguages && importedLanguages.has(data.language)) {
+        const language = importedLanguages.get(data.language)
+        if (language && language.getSupportedType().includes(data.judgeType)) {
+            return language.judge(data)
+        }
     }
     return Promise.resolve({
         uid: data.uid,
-        result: Array(data.dataSet.data.length).fill(false),
+        result: Array(data.dataSet.data.length).fill(0),
         reason: 'CE',
         message: 'Unknown judge type',
         time: 0,
