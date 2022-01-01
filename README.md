@@ -1,6 +1,8 @@
-# HANA
+<p align="center"><img alt="logo" src="res/logo.png" width="200"></p>
 
-<img src="res/logo.png" width="200" alt="logo">
+<h1 align="center">HANA</h1>
+
+[![Build Status](https://github.com/HancomAC/HANA/actions/workflows/.github/workflows/ci.yml/badge.svg)](https://github.com/HancomAC/HANA/actions/workflows/ci.yml)
 
 HANA is a PS Judgement Server that runs on Docker.
 
