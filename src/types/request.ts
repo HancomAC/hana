@@ -61,20 +61,27 @@ export interface CommonDataSet extends SubTask {
     }[]
 }
 
-export interface JudgeRequest<
+export interface ExecuteRequest<
     TJudgeType extends JudgeType = JudgeType,
     TJudgeSourceType extends JudgeSourceType = JudgeSourceType,
     TSubTask extends SubTask = SubTask
 > {
     uid: string
+    timeLimit: number
+    memoryLimit: number
+}
+
+export interface JudgeRequest<
+    TJudgeType extends JudgeType = JudgeType,
+    TJudgeSourceType extends JudgeSourceType = JudgeSourceType,
+    TSubTask extends SubTask = SubTask
+> extends ExecuteRequest<TJudgeType, TJudgeSourceType, TSubTask> {
     language: TJudgeSourceType
     judgeType: TJudgeType
     source: SourceFile[]
     dataSet: TSubTask[]
-    timeLimit: number
-    memoryLimit: number
     specialJudge?: {
         language: JudgeSourceType
-        source: SourceFile[]
+        source: string
     }
 }

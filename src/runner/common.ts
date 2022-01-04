@@ -1,4 +1,4 @@
-import { JudgeRequest, ScoringType } from '../types/request'
+import { JudgeRequest, JudgeType, ScoringType } from '../types/request'
 import { sendMessage } from '../socket'
 import {
     JudgeResult,
@@ -6,20 +6,21 @@ import {
     WebSocketResponseType,
 } from '../types/response'
 import {
-    initTempEnv,
-    isSame,
-    ResultType,
-    executeJudge,
     clearTempEnv,
+    executeJudge,
     ExecuteResult,
     getTmpPath,
+    initTempEnv,
+    isSame,
     representativeResult,
+    ResultType,
 } from './util'
+import { initSpecialJudge, clearSpecialJudge, runSpecialJudge } from './special'
 
 export default function commonJudge(
     data: JudgeRequest,
     build: ((path: string, uid: string) => Promise<ExecuteResult>) | null,
-    getExePath: (path: string, uid: string) => string
+    getExecuteCommand: (path: string, uid: string) => string
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
         sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
@@ -31,7 +32,8 @@ export default function commonJudge(
         const tmpPath = initTempEnv(data.uid, data.source)
 
         let message = '',
-            judgedProblemCount = 0
+            judgedProblemCount = 0,
+            specialJudgeUID = ''
         const result: (number | number[])[] = [],
             judgeResult: JudgeResultCode[] = [],
             maxMemoryUsage: number[] = [],
@@ -68,6 +70,32 @@ export default function commonJudge(
             }
         }
 
+        if (data.specialJudge) {
+            specialJudgeUID = await initSpecialJudge(
+                data.specialJudge.language,
+                data.specialJudge.source
+            )
+            if (!specialJudgeUID) {
+                resolve({
+                    uid: data.uid,
+                    result: data.dataSet.map((subtask) => {
+                        switch (subtask.scoringType) {
+                            case ScoringType.QUANTIZED:
+                                return 0
+                            case ScoringType.PROPORTIONAL:
+                                return Array(subtask.data.length).fill(0)
+                        }
+                    }),
+                    resultCode: 'CE',
+                    reason: Array(data.dataSet.length).fill('CE'),
+                    time: Array(data.dataSet.length).fill(0),
+                    memory: Array(data.dataSet.length).fill(0),
+                    message: 'Initialize special judge failed',
+                })
+                return
+            }
+        }
+
         sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
             uid: data.uid,
             progress: 0,
@@ -85,7 +113,7 @@ export default function commonJudge(
             for (const i in subtask.data) {
                 const { code, stdout, stderr, resultType } = await executeJudge(
                     data,
-                    getExePath(tmpPath, data.uid),
+                    getExecuteCommand(tmpPath, data.uid),
                     subtask.data[i].input
                 )
                 if (code) {
@@ -130,10 +158,33 @@ export default function commonJudge(
                                     subtask.data.length - parseInt(i)
                             break
                         }
-                    } else if (isSame(stdout, subtask.data[i].output)) {
-                        subtaskJudgeResult.push('AC')
-                        subtaskResult[i as any] = 1
                     } else {
+                        if (
+                            (data.judgeType === JudgeType.CommonJudge ||
+                                data.judgeType === JudgeType.Interactive) &&
+                            isSame(stdout, subtask.data[i].output)
+                        ) {
+                            subtaskJudgeResult.push('AC')
+                            subtaskResult[i as any] = 1
+                            continue
+                        }
+                        if (
+                            data.judgeType === JudgeType.SpecialJudge &&
+                            data.specialJudge &&
+                            (await runSpecialJudge(
+                                specialJudgeUID,
+                                data.specialJudge.language,
+                                {
+                                    input: subtask.data[i].input,
+                                    solution: subtask.data[i].output,
+                                    output: stdout,
+                                }
+                            ))
+                        ) {
+                            subtaskJudgeResult.push('AC')
+                            subtaskResult[i as any] = 1
+                            continue
+                        }
                         subtaskJudgeResult.push('WA')
                         if (subtask.scoringType === ScoringType.QUANTIZED) {
                             if (subtask.scoringType === ScoringType.QUANTIZED)
@@ -166,8 +217,15 @@ export default function commonJudge(
             judgeResult.push(representativeResult(subtaskJudgeResult))
             maxTimeUsage.push(subtaskMaxTimeUsage)
             maxMemoryUsage.push(subtaskMaxMemoryUsage)
+
+            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                uid: data.uid,
+                progress: judgedProblemCount / problemCount,
+                resultCode: 'RUN',
+            })
         }
         clearTempEnv(data.uid)
+        if (data.specialJudge) clearSpecialJudge(specialJudgeUID)
         resolve({
             uid: data.uid,
             result,

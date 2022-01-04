@@ -2,16 +2,24 @@ import { JudgeRequest, JudgeType } from '../types/request'
 import { JudgeResult } from '../types/response'
 import fs from 'fs'
 import path from 'path'
-import { getExecuteCommand } from './languages/kotlin'
-import {ExecuteResult} from "./util";
+import { ExecuteResult } from './util'
 
 export interface LanguageModule {
     getSupportedType: () => JudgeType[]
     judge?: (data: JudgeRequest) => Promise<JudgeResult>
     getTimeLimit: (baseTime: number) => number
     getMemoryLimit: (baseMemory: number) => number
-    build?: (path: string, uid: string) => Promise<ExecuteResult>
-    getExecuteCommand?: (path: string, uid: string) => string
+    build?: (
+        path: string,
+        uid: string,
+        sourceName?: string
+    ) => Promise<ExecuteResult>
+    getExecuteCommand: (
+        path: string,
+        uid: string,
+        sourceName?: string
+    ) => string
+    getExtension: () => string
 }
 
 export interface LanguageModuleBase extends LanguageModule {
@@ -45,6 +53,7 @@ export function loadLanguages() {
                         getExecuteCommand: module.getExecuteCommand,
                         getTimeLimit: module.getTimeLimit,
                         getMemoryLimit: module.getMemoryLimit,
+                        getExtension: module.getExtension,
                     })
                 }
             })

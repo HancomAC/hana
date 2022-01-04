@@ -1,10 +1,7 @@
-import { JudgeRequest, JudgeType, ScoringType } from '../types/request'
+import { JudgeRequest, ScoringType } from '../types/request'
 import { JudgeResult } from '../types/response'
-import * as fs from 'fs'
-import * as path from 'path'
-import { loadLanguage, loadLanguages } from './loader'
+import { loadLanguage } from './loader'
 import commonJudge from './common'
-import { getExecuteCommand } from './languages/pypy3'
 import { ExecuteResult } from './util'
 
 export default async function (data: JudgeRequest): Promise<JudgeResult> {

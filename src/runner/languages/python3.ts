@@ -1,8 +1,11 @@
-import { JudgeRequest, JudgeSourceType, JudgeType } from '../../types/request'
-import commonJudge from '../common'
+import { JudgeSourceType, JudgeType } from '../../types/request'
 import { execute, getLimitString, ResultType } from '../util'
 
-export async function build(path: string, uid: string) {
+export async function build(
+    path: string,
+    uid: string,
+    sourceName: string = 'Main'
+) {
     await execute(
         `p-${uid}`,
         getLimitString({ cpuLimit: 50 }, `python3 -m compileall -b ${path}`),
@@ -16,16 +19,28 @@ export async function build(path: string, uid: string) {
     }
 }
 
-export function getExecuteCommand(path: string, uid: string) {
-    return `python3 ${path}/Main.py`
+export function getExecuteCommand(
+    path: string,
+    uid: string,
+    sourceName: string = 'Main'
+) {
+    return `python3 ${path}/${sourceName}.${getExtension()}`
 }
 
 export function getLanguage() {
     return JudgeSourceType.PYTHON3
 }
 
+export function getExtension() {
+    return 'py'
+}
+
 export function getSupportedType() {
-    return [JudgeType.CommonJudge, JudgeType.Interactive, JudgeType.SpecialJudge]
+    return [
+        JudgeType.CommonJudge,
+        JudgeType.Interactive,
+        JudgeType.SpecialJudge,
+    ]
 }
 
 export function getTimeLimit(baseTime: number) {

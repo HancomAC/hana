@@ -45,6 +45,10 @@ export function getLanguage() {
     return JudgeSourceType.TEXT
 }
 
+export function getExtension() {
+    return 'txt'
+}
+
 export function getSupportedType() {
     return [JudgeType.OutputOnly]
 }

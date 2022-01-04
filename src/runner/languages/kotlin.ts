@@ -1,28 +1,39 @@
-import { JudgeRequest, JudgeSourceType, JudgeType } from '../../types/request'
+import { JudgeSourceType, JudgeType } from '../../types/request'
 import { execute, getLimitString } from '../util'
-import commonJudge from '../common'
 
-export function build(path: string, uid: string) {
+export function build(path: string, uid: string, sourceName: string = 'Main') {
     return execute(
         `root`,
         getLimitString(
             { cpuLimit: 50 },
-            `ls;kotlinc-native -o Main -opt Main.kt`
+            `ls;kotlinc-native -o ${sourceName} -opt ${sourceName}.${getExtension()}`
         ),
         { cwd: path }
     )
 }
 
-export function getExecuteCommand(path: string, uid: string) {
-    return path + '/Main'
+export function getExecuteCommand(
+    path: string,
+    uid: string,
+    sourceName: string = 'Main'
+) {
+    return `${path}/${sourceName}`
 }
 
 export function getLanguage() {
     return JudgeSourceType.KOTLIN
 }
 
+export function getExtension() {
+    return 'kt'
+}
+
 export function getSupportedType() {
-    return [JudgeType.CommonJudge, JudgeType.Interactive, JudgeType.SpecialJudge]
+    return [
+        JudgeType.CommonJudge,
+        JudgeType.Interactive,
+        JudgeType.SpecialJudge,
+    ]
 }
 
 export function getTimeLimit(baseTime: number) {

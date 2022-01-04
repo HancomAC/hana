@@ -372,7 +372,38 @@ console.log(a+b);`,
                     },
                     body: JSON.stringify({
                         language: select.selectedText.innerText,
-                        judgeType: 'CommonJudge',
+                        judgeType: 'SpecialJudge',
+                        specialJudge: {
+                            language: 'CPP',
+                            source: `#include <stdio.h>
+#include <string.h>
+
+FILE * fin;
+FILE * fsol;
+FILE * fuser;
+
+int main(int argc,char *args[])
+{
+\tfin=fopen(args[1],"r");
+\tfsol=fopen(args[2],"r");
+\tfuser=fopen(args[3],"r");
+
+\tint ret=0;
+\tchar a[100], c[100];
+\twhile(fscanf(fsol," %[^\\r\\n]s",a) != EOF){
+  fscanf(fuser," %[^\\r\\n]s",c);
+  if(strcmp(a,c)!=0) {
+  ret=1;
+  break;
+  }
+\t}
+\tfclose(fin);
+\tfclose(fsol);
+\tfclose(fuser);
+\treturn ret; // 0 이면 성공, 1이면 실패
+}
+`,
+                        },
                         source: [
                             {
                                 name:
@@ -472,7 +503,7 @@ console.log(a+b);`,
                 )
                 document
                     .querySelector('.mdc-select')
-                    .addEventListener('MDCSelect:change', function (a) {
+                    .addEventListener('MDCSelect:change', () => {
                         try {
                             document.getElementById('source').value =
                                 exampleCode[select.selectedText.innerText]

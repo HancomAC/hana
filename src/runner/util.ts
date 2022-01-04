@@ -1,6 +1,6 @@
 import { execSync, spawn } from 'child_process'
 import fs from 'fs'
-import { JudgeRequest, SourceFile } from '../types/request'
+import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
 
 export const enum ResultType {
@@ -133,7 +133,7 @@ export function getLimitString(
 }
 
 export function executeJudge(
-    data: JudgeRequest,
+    data: ExecuteRequest,
     exePath: string,
     input: string
 ) {

@@ -3,7 +3,7 @@ import expressWs from 'express-ws'
 import { v4 as uuid } from 'uuid'
 import { init } from './socket'
 import { requestJudge } from './judge'
-import { JudgeRequest, SourceFile } from './types/request'
+import { JudgeRequest } from './types/request'
 
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
@@ -23,6 +23,7 @@ app.post('/judge', (req, res) => {
             dataSet: req.body.dataSet,
             timeLimit: req.body.timeLimit,
             memoryLimit: req.body.memoryLimit,
+            specialJudge: req.body.specialJudge,
         } as JudgeRequest
         requestJudge(problem)
         res.send({ success: true, uid: problem.uid })
