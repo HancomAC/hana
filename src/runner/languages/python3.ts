@@ -2,25 +2,24 @@ import { JudgeRequest, JudgeSourceType, JudgeType } from '../../types/request'
 import commonJudge from '../common'
 import { execute, getLimitString, ResultType } from '../util'
 
+export async function build(path: string, uid: string) {
+    await execute(
+        `p-${uid}`,
+        getLimitString({ cpuLimit: 50 }, `python3 -m compileall -b ${path}`),
+        { cwd: path }
+    )
+    return {
+        resultType: ResultType.normal,
+        code: 0,
+        stderr: '',
+        stdout: '',
+    }
+}
+
 export function judge(data: JudgeRequest) {
     return commonJudge(
         data,
-        async (path) => {
-            await execute(
-                `p-${data.uid}`,
-                getLimitString(
-                    { cpuLimit: 50 },
-                    `python3 -m compileall -b ${path}`
-                ),
-                { cwd: path }
-            )
-            return {
-                resultType: ResultType.normal,
-                code: 0,
-                stderr: '',
-                stdout: '',
-            }
-        },
+        (path) => build(path, data.uid),
         (path) => `python3 ${path}/Main.py`
     )
 }

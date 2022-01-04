@@ -30,11 +30,16 @@ export default function commonJudge(
 
         const tmpPath = initTempEnv(data.uid, data.source)
 
-        let message = ''
+        let message = '',
+            judgedProblemCount = 0
         const result: (number | number[])[] = [],
             judgeResult: JudgeResultCode[] = [],
             maxMemoryUsage: number[] = [],
             maxTimeUsage: number[] = []
+        const problemCount = data.dataSet.reduce(
+            (acc, cur) => acc + cur.data.length,
+            0
+        )
 
         if (build) {
             const buildResult = await build(tmpPath)
@@ -99,7 +104,8 @@ export default function commonJudge(
                     }
                     if (!message)
                         message = errorMsg.replaceAll(getTmpPath(data.uid), '~')
-                    if (subtask.scoringType === ScoringType.QUANTIZED) break
+                    if (subtask.scoringType === ScoringType.QUANTIZED)
+                        judgedProblemCount += subtask.data.length - parseInt(i)
                 } else {
                     let info = '',
                         err = stderr.split('\n')
@@ -118,22 +124,28 @@ export default function commonJudge(
                     )
                     if (timeUsage > data.timeLimit) {
                         subtaskJudgeResult.push('TLE')
-                        if (subtask.scoringType === ScoringType.QUANTIZED) break
+                        if (subtask.scoringType === ScoringType.QUANTIZED) {
+                            if (subtask.scoringType === ScoringType.QUANTIZED)
+                                judgedProblemCount +=
+                                    subtask.data.length - parseInt(i)
+                            break
+                        }
                     } else if (isSame(stdout, subtask.data[i].output)) {
                         subtaskJudgeResult.push('AC')
                         subtaskResult[i as any] = 1
                     } else {
                         subtaskJudgeResult.push('WA')
-                        if (subtask.scoringType === ScoringType.QUANTIZED) break
+                        if (subtask.scoringType === ScoringType.QUANTIZED) {
+                            if (subtask.scoringType === ScoringType.QUANTIZED)
+                                judgedProblemCount +=
+                                    subtask.data.length - parseInt(i)
+                            break
+                        }
                     }
                 }
                 sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                     uid: data.uid,
-                    progress:
-                        (parseInt(i) + 1) /
-                            subtask.data.length /
-                            data.dataSet.length +
-                        parseInt(subtaskI) / data.dataSet.length,
+                    progress: ++judgedProblemCount / problemCount,
                     resultCode: 'RUN',
                 })
             }

@@ -2,18 +2,21 @@ import { JudgeRequest, JudgeSourceType, JudgeType } from '../../types/request'
 import { execute, getLimitString } from '../util'
 import commonJudge from '../common'
 
+export function build(path: string, uid: string) {
+    return execute(
+        `root`,
+        getLimitString(
+            { cpuLimit: 50 },
+            `ls;kotlinc-native -o Main -opt Main.kt`
+        ),
+        { cwd: path }
+    )
+}
+
 export function judge(data: JudgeRequest) {
     return commonJudge(
         data,
-        (path) =>
-            execute(
-                `root`,
-                getLimitString(
-                    { cpuLimit: 50 },
-                    `ls;kotlinc-native -o Main -opt Main.kt`
-                ),
-                { cwd: path }
-            ),
+        (path) => build(path, data.uid),
         (path) => path + '/Main'
     )
 }
