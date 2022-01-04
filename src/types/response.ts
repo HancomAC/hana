@@ -25,6 +25,7 @@ export interface JudgeResult {
     memory: number[]
     example?: {
         output: string
+        case: number
         no: number
     }
     message?: string

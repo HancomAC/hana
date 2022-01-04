@@ -1,6 +1,12 @@
 import { JudgeSourceType } from '../types/request'
 import { loadLanguage } from './loader'
-import { clearTempEnv, executeJudge, getTmpPath, initTempEnv } from './util'
+import {
+    clearTempEnv,
+    executeJudge,
+    getTmpPath,
+    initTempEnv,
+    tryIt,
+} from './util'
 import fs from 'fs'
 import { v4 as uuid } from 'uuid'
 
@@ -52,6 +58,10 @@ export async function runSpecialJudge(
     const languageModule = await loadLanguage(language)
     if (!languageModule) return false
 
+    tryIt(() => fs.rmSync(tmpPath + '/' + specialJudgeIn))
+    tryIt(() => fs.rmSync(tmpPath + '/' + specialJudgeSolution))
+    tryIt(() => fs.rmSync(tmpPath + '/' + specialJudgeOut))
+
     fs.writeFileSync(tmpPath + '/' + specialJudgeIn, data.input)
     fs.writeFileSync(tmpPath + '/' + specialJudgeSolution, data.solution)
     fs.writeFileSync(tmpPath + '/' + specialJudgeOut, data.output)
@@ -64,13 +74,20 @@ export async function runSpecialJudge(
         },
         languageModule.getExecuteCommand(tmpPath, uid, specialJudgeSource) +
             ' ' +
+            tmpPath +
+            '/' +
             specialJudgeIn +
             ' ' +
+            tmpPath +
+            '/' +
             specialJudgeSolution +
             ' ' +
+            tmpPath +
+            '/' +
             specialJudgeOut,
         ''
     )
+    if (result.code) console.log(result)
 
     return result.code === 0
 }

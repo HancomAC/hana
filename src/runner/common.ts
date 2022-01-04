@@ -33,7 +33,9 @@ export default function commonJudge(
 
         let message = '',
             judgedProblemCount = 0,
-            specialJudgeUID = ''
+            specialJudgeUID = '',
+            example
+
         const result: (number | number[])[] = [],
             judgeResult: JudgeResultCode[] = [],
             maxMemoryUsage: number[] = [],
@@ -159,6 +161,11 @@ export default function commonJudge(
                             break
                         }
                     } else {
+                        sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                            uid: data.uid,
+                            progress: ++judgedProblemCount / problemCount,
+                            resultCode: 'RUN',
+                        })
                         if (
                             (data.judgeType === JudgeType.CommonJudge ||
                                 data.judgeType === JudgeType.Interactive) &&
@@ -166,11 +173,6 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
-                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                                uid: data.uid,
-                                progress: ++judgedProblemCount / problemCount,
-                                resultCode: 'RUN',
-                            })
                             continue
                         }
                         if (
@@ -188,24 +190,21 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
-                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                                uid: data.uid,
-                                progress: ++judgedProblemCount / problemCount,
-                                resultCode: 'RUN',
-                            })
                             continue
                         }
                         subtaskJudgeResult.push('WA')
+                        if (!example) {
+                            example = {
+                                case: parseInt(subtaskI),
+                                no: parseInt(i),
+                                output: stdout,
+                            }
+                        }
                         if (subtask.scoringType === ScoringType.QUANTIZED) {
                             judgedProblemCount +=
                                 subtask.data.length - parseInt(i)
                             break
                         }
-                        sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                            uid: data.uid,
-                            progress: ++judgedProblemCount / problemCount,
-                            resultCode: 'RUN',
-                        })
                     }
                 }
             }
@@ -243,6 +242,7 @@ export default function commonJudge(
             time: maxTimeUsage,
             memory: maxMemoryUsage,
             message,
+            example,
         })
     })
 }

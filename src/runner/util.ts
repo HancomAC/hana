@@ -19,29 +19,29 @@ export interface ExecuteResult {
 export function execute(
     userName: string,
     exePath: string,
-    option: { input?: string; timeout?: number; cwd?: string } = {}
+    option: { input?: string; timeout?: number; cwd?: string } = {},
+    recursive = 0
 ) {
     option = Object.assign({ input: '', timeout: 0, cwd: '' }, option)
     return new Promise<ExecuteResult>((resolve) => {
+        if (recursive > 3) {
+            resolve({
+                resultType: ResultType.stdioError,
+                stdout: '',
+                stderr: '',
+                code: -1,
+            })
+            return
+        }
         const child = spawn(`su`, [userName, '-c', exePath], {
             stdio: ['pipe', 'pipe', 'pipe'],
             ...(option.cwd ? { cwd: option.cwd } : {}),
         })
-        child.stdin.on('error', () => {
-            resolve({
-                resultType: ResultType.stdioError,
-                code: -1,
-                stdout: '',
-                stderr: '',
-            })
+        child.stdin.on('error', async () => {
+            resolve(await execute(userName, exePath, option))
         })
-        child.on('error', () => {
-            resolve({
-                resultType: ResultType.stdioError,
-                code: -1,
-                stdout: '',
-                stderr: '',
-            })
+        child.on('error', async () => {
+            resolve(await execute(userName, exePath, option))
         })
 
         let timeHandler: NodeJS.Timeout,
@@ -154,4 +154,10 @@ export function representativeResult(results: JudgeResultCode[]) {
     if (results.includes('MLE')) return 'MLE'
     if (results.includes('WA')) return 'WA'
     return 'AC'
+}
+
+export function tryIt(command: any) {
+    try {
+        command()
+    } catch (e) {}
 }
