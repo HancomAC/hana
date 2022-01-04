@@ -166,6 +166,11 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
+                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                                uid: data.uid,
+                                progress: ++judgedProblemCount / problemCount,
+                                resultCode: 'RUN',
+                            })
                             continue
                         }
                         if (
@@ -183,22 +188,26 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
+                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                                uid: data.uid,
+                                progress: ++judgedProblemCount / problemCount,
+                                resultCode: 'RUN',
+                            })
                             continue
                         }
                         subtaskJudgeResult.push('WA')
                         if (subtask.scoringType === ScoringType.QUANTIZED) {
-                            if (subtask.scoringType === ScoringType.QUANTIZED)
-                                judgedProblemCount +=
-                                    subtask.data.length - parseInt(i)
+                            judgedProblemCount +=
+                                subtask.data.length - parseInt(i)
                             break
                         }
+                        sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                            uid: data.uid,
+                            progress: ++judgedProblemCount / problemCount,
+                            resultCode: 'RUN',
+                        })
                     }
                 }
-                sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                    uid: data.uid,
-                    progress: ++judgedProblemCount / problemCount,
-                    resultCode: 'RUN',
-                })
             }
 
             subtaskMaxTimeUsage = Math.min(
