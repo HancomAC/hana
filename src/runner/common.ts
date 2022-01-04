@@ -90,7 +90,9 @@ export default function commonJudge(
                 const memUsage = parseInt(info.split('|')[1])
                 maxTimeUsage = Math.max(maxTimeUsage, timeUsage)
                 maxMemoryUsage = Math.max(maxMemoryUsage, memUsage)
-                if (isSame(stdout, data.dataSet.data[i].output))
+                if (timeUsage > data.timeLimit)
+                    judgeResult = 'TLE' as JudgeResultCode
+                else if (isSame(stdout, data.dataSet.data[i].output))
                     result[i as any] = 1
                 else if (judgeResult === 'AC')
                     judgeResult = 'WA' as JudgeResultCode
@@ -106,7 +108,7 @@ export default function commonJudge(
             uid: data.uid,
             result,
             reason: judgeResult,
-            time: Math.round(maxTimeUsage),
+            time: Math.min(Math.round(maxTimeUsage), data.timeLimit),
             memory: maxMemoryUsage,
             message,
         })
