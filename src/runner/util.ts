@@ -23,7 +23,7 @@ export function execute(
     recursive = 0
 ) {
     option = Object.assign({ input: '', timeout: 0, cwd: '' }, option)
-    return new Promise<ExecuteResult>((resolve) => {
+    return new Promise<ExecuteResult>(async (resolve) => {
         if (recursive > 3) {
             resolve({
                 resultType: ResultType.stdioError,
@@ -38,20 +38,25 @@ export function execute(
             ...(option.cwd ? { cwd: option.cwd } : {}),
         })
         child.stdin.on('error', async () => {
-            resolve(await execute(userName, exePath, option))
+            if (!timeouted) {
+                await execute(`${userName}`, `pkill -u ${userName}`)
+                resolve(await execute(userName, exePath, option))
+            }
         })
         child.on('error', async () => {
-            resolve(await execute(userName, exePath, option))
+            if (!timeouted) {
+                await execute(`${userName}`, `pkill -u ${userName}`)
+                resolve(await execute(userName, exePath, option))
+            }
         })
 
         let timeHandler: NodeJS.Timeout,
             timeouted = false
 
         if (option.timeout)
-            timeHandler = setTimeout(() => {
+            timeHandler = setTimeout(async () => {
                 timeouted = true
-                ;(child.stdin as any).pause()
-                child.kill()
+                await execute(`${userName}`, `pkill -u ${userName}`)
                 resolve({
                     resultType: ResultType.timeLimitExceeded,
                     code: -1,

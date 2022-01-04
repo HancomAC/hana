@@ -140,11 +140,14 @@ export default function commonJudge(
                     }
                 } else {
                     let info = '',
-                        err = stderr.split('\n')
+                        err = stderr.split('\n'),
+                        timeUsage = 0
                     while (!info.includes('|') && err.length)
                         info = err.pop() || ''
-                    const timeUsage =
-                        parseFloat(info.split('m ')[1].split('s')[0]) * 1000
+                    try {
+                        timeUsage =
+                            parseFloat(info.split('m ')[1].split('s')[0]) * 1000
+                    } catch {}
                     const memUsage = parseInt(info.split('|')[1])
                     subtaskMaxTimeUsage = Math.max(
                         subtaskMaxTimeUsage,
