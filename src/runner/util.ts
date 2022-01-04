@@ -50,6 +50,7 @@ export function execute(
         if (option.timeout)
             timeHandler = setTimeout(() => {
                 timeouted = true
+                ;(child.stdin as any).pause()
                 child.kill()
                 resolve({
                     resultType: ResultType.timeLimitExceeded,

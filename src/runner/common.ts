@@ -134,8 +134,10 @@ export default function commonJudge(
                     }
                     if (!message)
                         message = errorMsg.replaceAll(getTmpPath(data.uid), '~')
-                    if (subtask.scoringType === ScoringType.QUANTIZED)
+                    if (subtask.scoringType === ScoringType.QUANTIZED) {
                         judgedProblemCount += subtask.data.length - parseInt(i)
+                        break
+                    }
                 } else {
                     let info = '',
                         err = stderr.split('\n')
@@ -155,17 +157,11 @@ export default function commonJudge(
                     if (timeUsage > data.timeLimit) {
                         subtaskJudgeResult.push('TLE')
                         if (subtask.scoringType === ScoringType.QUANTIZED) {
-                            if (subtask.scoringType === ScoringType.QUANTIZED)
-                                judgedProblemCount +=
-                                    subtask.data.length - parseInt(i)
+                            judgedProblemCount +=
+                                subtask.data.length - parseInt(i)
                             break
                         }
                     } else {
-                        sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
-                            uid: data.uid,
-                            progress: ++judgedProblemCount / problemCount,
-                            resultCode: 'RUN',
-                        })
                         if (
                             (data.judgeType === JudgeType.CommonJudge ||
                                 data.judgeType === JudgeType.Interactive) &&
@@ -173,6 +169,11 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
+                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                                uid: data.uid,
+                                progress: ++judgedProblemCount / problemCount,
+                                resultCode: 'RUN',
+                            })
                             continue
                         }
                         if (
@@ -190,6 +191,11 @@ export default function commonJudge(
                         ) {
                             subtaskJudgeResult.push('AC')
                             subtaskResult[i as any] = 1
+                            sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
+                                uid: data.uid,
+                                progress: ++judgedProblemCount / problemCount,
+                                resultCode: 'RUN',
+                            })
                             continue
                         }
                         subtaskJudgeResult.push('WA')
