@@ -130,7 +130,9 @@ export default function commonJudge(
                 sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
                     uid: data.uid,
                     progress:
-                        (parseInt(i) + 1) / subtask.data.length / subtask.data +
+                        (parseInt(i) + 1) /
+                            subtask.data.length /
+                            data.dataSet.length +
                         parseInt(subtaskI) / data.dataSet.length,
                     resultCode: 'RUN',
                 })

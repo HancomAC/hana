@@ -24,7 +24,7 @@ function judge(problem: string) {
     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
         uid: (problemMap.get(problem) as JudgeRequest).uid,
         progress: 0,
-        reason: 'CP',
+        resultCode: 'CP',
     })
     executeJudge(problemMap.get(problem) as JudgeRequest).then(
         (res: JudgeResult) => {
