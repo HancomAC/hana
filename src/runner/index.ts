@@ -2,59 +2,39 @@ import { JudgeRequest, JudgeType, ScoringType } from '../types/request'
 import { JudgeResult } from '../types/response'
 import * as fs from 'fs'
 import * as path from 'path'
-
-let importedLanguages: null | Map<
-    string,
-    {
-        getSupportedType: () => JudgeType[]
-        judge: (data: JudgeRequest) => Promise<JudgeResult>
-        getTimeLimit: (baseTime: number) => number
-        getMemoryLimit: (baseMemory: number) => number
-    }
->
-
-function loadLanguages() {
-    return new Promise<void>(async (resolve) => {
-        importedLanguages = new Map()
-        const files = fs.readdirSync(path.join(__dirname, 'languages'))
-        await Promise.all(
-            files.map(async (file) => {
-                if (file.endsWith('.js')) {
-                    const module: {
-                        getLanguage: () => string
-                        getSupportedType: () => JudgeType[]
-                        judge: (data: JudgeRequest) => Promise<JudgeResult>
-                        getTimeLimit: (baseTime: number) => number
-                        getMemoryLimit: (baseMemory: number) => number
-                        init?: () => Promise<void>
-                    } = require(path.join(__dirname, 'languages', file))
-                    if (module.init) await module.init()
-                    importedLanguages?.set(module.getLanguage(), {
-                        getSupportedType: module.getSupportedType,
-                        judge: module.judge,
-                        getTimeLimit: module.getTimeLimit,
-                        getMemoryLimit: module.getMemoryLimit,
-                    })
-                }
-            })
-        )
-        resolve()
-    })
-}
+import { loadLanguage, loadLanguages } from './loader'
+import commonJudge from './common'
+import { getExecuteCommand } from './languages/pypy3'
+import { ExecuteResult } from './util'
 
 export default async function (data: JudgeRequest): Promise<JudgeResult> {
-    if (!importedLanguages) await loadLanguages()
-
-    if (importedLanguages && importedLanguages.has(data.language)) {
-        const language = importedLanguages.get(data.language)
-        if (language && language.getSupportedType().includes(data.judgeType)) {
-            return await language.judge({
-                ...data,
-                timeLimit: language.getTimeLimit(data.timeLimit),
-                memoryLimit: language.getMemoryLimit(data.memoryLimit),
-            })
-        }
+    const languageModule = await loadLanguage(data.language)
+    let judge = null
+    if (
+        languageModule &&
+        languageModule.getSupportedType().includes(data.judgeType)
+    ) {
+        if (languageModule.judge) judge = languageModule.judge
+        else
+            judge = (data: JudgeRequest) =>
+                commonJudge(
+                    data,
+                    languageModule.build as (
+                        path: string,
+                        uid: string
+                    ) => Promise<ExecuteResult>,
+                    languageModule.getExecuteCommand as (
+                        path: string,
+                        uid: string
+                    ) => string
+                )
+        return await judge({
+            ...data,
+            timeLimit: languageModule.getTimeLimit(data.timeLimit),
+            memoryLimit: languageModule.getMemoryLimit(data.memoryLimit),
+        })
     }
+
     return {
         uid: data.uid,
         result: data.dataSet.map((subtask) => {

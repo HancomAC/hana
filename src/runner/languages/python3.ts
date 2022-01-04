@@ -16,12 +16,8 @@ export async function build(path: string, uid: string) {
     }
 }
 
-export function judge(data: JudgeRequest) {
-    return commonJudge(
-        data,
-        (path) => build(path, data.uid),
-        (path) => `python3 ${path}/Main.py`
-    )
+export function getExecuteCommand(path: string, uid: string) {
+    return `python3 ${path}/Main.py`
 }
 
 export function getLanguage() {
@@ -29,7 +25,7 @@ export function getLanguage() {
 }
 
 export function getSupportedType() {
-    return [JudgeType.CommonJudge, JudgeType.Interactive]
+    return [JudgeType.CommonJudge, JudgeType.Interactive, JudgeType.SpecialJudge]
 }
 
 export function getTimeLimit(baseTime: number) {

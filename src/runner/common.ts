@@ -18,8 +18,8 @@ import {
 
 export default function commonJudge(
     data: JudgeRequest,
-    build: ((path: string) => Promise<ExecuteResult>) | null,
-    getExePath: (path: string) => string
+    build: ((path: string, uid: string) => Promise<ExecuteResult>) | null,
+    getExePath: (path: string, uid: string) => string
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
         sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
@@ -42,7 +42,7 @@ export default function commonJudge(
         )
 
         if (build) {
-            const buildResult = await build(tmpPath)
+            const buildResult = await build(tmpPath, data.uid)
 
             if (buildResult.code) {
                 clearTempEnv(data.uid)
@@ -85,7 +85,7 @@ export default function commonJudge(
             for (const i in subtask.data) {
                 const { code, stdout, stderr, resultType } = await executeJudge(
                     data,
-                    getExePath(tmpPath),
+                    getExePath(tmpPath, data.uid),
                     subtask.data[i].input
                 )
                 if (code) {

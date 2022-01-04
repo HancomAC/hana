@@ -13,12 +13,8 @@ export function build(path: string, uid: string) {
     )
 }
 
-export function judge(data: JudgeRequest) {
-    return commonJudge(
-        data,
-        (path) => build(path, data.uid),
-        (path) => path + '/Main'
-    )
+export function getExecuteCommand(path: string, uid: string) {
+    return path + '/Main'
 }
 
 export function getLanguage() {
@@ -26,7 +22,11 @@ export function getLanguage() {
 }
 
 export function getSupportedType() {
-    return [JudgeType.CommonJudge, JudgeType.Interactive]
+    return [
+        JudgeType.CommonJudge,
+        JudgeType.Interactive,
+        JudgeType.SpecialJudge,
+    ]
 }
 
 export function getTimeLimit(baseTime: number) {

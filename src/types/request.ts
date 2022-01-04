@@ -17,6 +17,7 @@ export const enum JudgeType {
     CommonJudge = 'CommonJudge',
     OutputOnly = 'OutputOnly',
     Interactive = 'Interactive',
+    SpecialJudge = 'SpecialJudge',
     COMPETITIVE = 'COMPETITIVE',
 }
 
@@ -72,4 +73,8 @@ export interface JudgeRequest<
     dataSet: TSubTask[]
     timeLimit: number
     memoryLimit: number
+    specialJudge?: {
+        language: JudgeSourceType
+        source: SourceFile[]
+    }
 }
