@@ -33,6 +33,14 @@ export function getSupportedType() {
     return [JudgeType.CommonJudge, JudgeType.Interactive]
 }
 
+export function getTimeLimit(baseTime: number) {
+    return baseTime
+}
+
+export function getMemoryLimit(baseMemory: number) {
+    return baseMemory
+}
+
 export async function init() {
     await execute('root', 'yarn', { cwd: '/include/TYPESCRIPT' })
 }

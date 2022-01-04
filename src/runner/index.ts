@@ -8,6 +8,8 @@ let importedLanguages: null | Map<
     {
         getSupportedType: () => JudgeType[]
         judge: (data: JudgeRequest) => Promise<JudgeResult>
+        getTimeLimit: (baseTime: number) => number
+        getMemoryLimit: (baseMemory: number) => number
     }
 >
 
@@ -22,12 +24,16 @@ function loadLanguages() {
                         getLanguage: () => string
                         getSupportedType: () => JudgeType[]
                         judge: (data: JudgeRequest) => Promise<JudgeResult>
+                        getTimeLimit: (baseTime: number) => number
+                        getMemoryLimit: (baseMemory: number) => number
                         init?: () => Promise<void>
                     } = require(path.join(__dirname, 'languages', file))
                     if (module.init) await module.init()
                     importedLanguages?.set(module.getLanguage(), {
                         getSupportedType: module.getSupportedType,
                         judge: module.judge,
+                        getTimeLimit: module.getTimeLimit,
+                        getMemoryLimit: module.getMemoryLimit,
                     })
                 }
             })
@@ -42,7 +48,11 @@ export default async function (data: JudgeRequest): Promise<JudgeResult> {
     if (importedLanguages && importedLanguages.has(data.language)) {
         const language = importedLanguages.get(data.language)
         if (language && language.getSupportedType().includes(data.judgeType)) {
-            return await language.judge(data)
+            return await language.judge({
+                ...data,
+                timeLimit: language.getTimeLimit(data.timeLimit),
+                memoryLimit: language.getMemoryLimit(data.memoryLimit),
+            })
         }
     }
     return {

@@ -45,3 +45,11 @@ export function getLanguage() {
 export function getSupportedType() {
     return [JudgeType.OutputOnly]
 }
+
+export function getTimeLimit(baseTime: number) {
+    return 0
+}
+
+export function getMemoryLimit(baseMemory: number) {
+    return 0
+}
