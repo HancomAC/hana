@@ -294,18 +294,28 @@ console.log(a+b);`,
                                 ${
                                     res.data.example
                                         ? `<h4>Example</h4>
+                            <h5>Input</h5>
+                            <p style="white-space: pre;">${
+                                ProblemDataSet[res.data.example.case].data[
+                                    res.data.example.no
+                                ].input
+                            }</p>
                             <h5>Valid Output</h5>
-                            <p>${
+                            <p style="white-space: pre;">${
                                 ProblemDataSet[res.data.example.case].data[
                                     res.data.example.no
                                 ].output
                             }</p>
                             <h5>Your Output</h5>
-                            <p>${res.data.example.output}</p>`
+                            <p style="white-space: pre;">${
+                                res.data.example.output
+                            }</p>`
                                         : ''
                                 }
                                 <h4>Message</h4>
-                                <p>${res.data.message}</p>
+                                <p style="white-space: pre;">${
+                                    res.data.message
+                                }</p>
                                 <h4>Run Info</h4>
                                 <p>Time: ${res.data.time}ms, Memory: ${
                                 res.data.memory
@@ -610,6 +620,7 @@ int main(int argc,char *args[])
                             cols="40"
                             aria-label="Label"
                             id="source"
+                            onkeydown="if(event.keyCode == 9) { this.value += '    '; return false; }"
                         ></textarea>
                     </span>
                 </label>

@@ -87,7 +87,6 @@ export async function runSpecialJudge(
             specialJudgeOut,
         ''
     )
-    if (result.code) console.log(result)
 
     return result.code === 0
 }
