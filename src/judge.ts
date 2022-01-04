@@ -39,7 +39,7 @@ export function requestJudge(problem: JudgeRequest) {
     sendMessage(WebSocketResponseType.JUDGE_PROGRESS, {
         uid: problem.uid,
         progress: 0,
-        reason: 'PD',
+        resultCode: 'PD',
     })
     while (judgeList.length < MultiJudgeCount && waitList.length)
         judge(waitList.shift() as string)

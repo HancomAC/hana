@@ -1,6 +1,7 @@
 import { execSync, spawn } from 'child_process'
 import fs from 'fs'
 import { JudgeRequest, SourceFile } from '../types/request'
+import { JudgeResultCode } from '../types/response'
 
 export const enum ResultType {
     normal,
@@ -144,4 +145,13 @@ export function executeJudge(
         ),
         { input, timeout: data.timeLimit || 0, cwd: getTmpPath(data.uid) }
     )
+}
+
+export function representativeResult(results: JudgeResultCode[]) {
+    if (results.includes('CE')) return 'CE'
+    if (results.includes('RE')) return 'RE'
+    if (results.includes('TLE')) return 'TLE'
+    if (results.includes('MLE')) return 'MLE'
+    if (results.includes('WA')) return 'WA'
+    return 'AC'
 }

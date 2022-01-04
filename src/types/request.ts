@@ -8,6 +8,11 @@ export interface WebSocketRequest {
     data?: any
 }
 
+export const enum ScoringType {
+    PROPORTIONAL = 'PROPORTIONAL',
+    QUANTIZED = 'QUANTIZED',
+}
+
 export const enum JudgeType {
     CommonJudge = 'CommonJudge',
     OutputOnly = 'OutputOnly',
@@ -38,13 +43,17 @@ export interface DataSet {
     data: any
 }
 
-export interface OutputOnly extends DataSet {
+export interface SubTask extends DataSet {
+    scoringType: ScoringType
+}
+
+export interface OutputOnly extends SubTask {
     data: {
         output: string
     }[]
 }
 
-export interface CommonDataSet extends DataSet {
+export interface CommonDataSet extends SubTask {
     data: {
         input: string
         output: string
@@ -54,13 +63,13 @@ export interface CommonDataSet extends DataSet {
 export interface JudgeRequest<
     TJudgeType extends JudgeType = JudgeType,
     TJudgeSourceType extends JudgeSourceType = JudgeSourceType,
-    TDataSet extends DataSet = DataSet
+    TSubTask extends SubTask = SubTask
 > {
     uid: string
     language: TJudgeSourceType
     judgeType: TJudgeType
     source: SourceFile[]
-    dataSet: TDataSet
+    dataSet: TSubTask[]
     timeLimit: number
     memoryLimit: number
 }

@@ -1,4 +1,4 @@
-import { JudgeRequest, JudgeType } from '../types/request'
+import { JudgeRequest, JudgeType, ScoringType } from '../types/request'
 import { JudgeResult } from '../types/response'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -57,10 +57,18 @@ export default async function (data: JudgeRequest): Promise<JudgeResult> {
     }
     return {
         uid: data.uid,
-        result: Array(data.dataSet.data.length).fill(0),
-        reason: 'CE',
+        result: data.dataSet.map((subtask) => {
+            switch (subtask.scoringType) {
+                case ScoringType.QUANTIZED:
+                    return 0
+                case ScoringType.PROPORTIONAL:
+                    return Array(subtask.data.length).fill(0)
+            }
+        }),
+        resultCode: 'CE',
+        reason: Array(data.dataSet.length).fill('CE'),
         message: 'Unknown judge type',
-        time: 0,
-        memory: 0,
+        time: Array(data.dataSet.length).fill(0),
+        memory: Array(data.dataSet.length).fill(0),
     }
 }

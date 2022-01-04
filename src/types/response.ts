@@ -1,4 +1,4 @@
-export type JudgeResultCode = 'AC' | 'WA' | 'RTE' | 'TLE' | 'MLE' | 'OLE' | 'CE'
+export type JudgeResultCode = 'AC' | 'WA' | 'RE' | 'TLE' | 'MLE' | 'CE'
 export type JudgeStatusCode = JudgeResultCode | 'PD' | 'CP' | 'RUN'
 
 export const enum WebSocketResponseType {
@@ -18,10 +18,11 @@ export interface WebSocketResponse {
 
 export interface JudgeResult {
     uid: string
-    result: number[]
-    reason: JudgeResultCode
-    time: number
-    memory: number
+    result: (number[] | number)[]
+    resultCode: JudgeResultCode
+    reason: JudgeResultCode[]
+    time: number[]
+    memory: number[]
     example?: {
         output: string
         no: number
