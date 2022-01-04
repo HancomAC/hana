@@ -12,6 +12,7 @@ export const enum JudgeType {
     CommonJudge = 'CommonJudge',
     OutputOnly = 'OutputOnly',
     Interactive = 'Interactive',
+    COMPETITIVE = 'COMPETITIVE',
 }
 
 export const enum JudgeSourceType {
@@ -25,6 +26,7 @@ export const enum JudgeSourceType {
     TYPESCRIPT = 'TYPESCRIPT',
     GO = 'GO',
     RUST = 'RUST',
+    KOTLIN = 'KOTLIN',
 }
 
 export interface SourceFile {
