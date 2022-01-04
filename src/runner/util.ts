@@ -39,13 +39,19 @@ export function execute(
         })
         child.stdin.on('error', async () => {
             if (!timeouted) {
-                await execute(`${userName}`, `pkill -u ${userName}`)
+                // @ts-ignore
+                child.stdin.pause()
+                child.kill('SIGKILL')
+                await execute(`${userName}`, `pkill -9 -u ${userName}`)
                 resolve(await execute(userName, exePath, option))
             }
         })
         child.on('error', async () => {
             if (!timeouted) {
-                await execute(`${userName}`, `pkill -u ${userName}`)
+                // @ts-ignore
+                child.stdin.pause()
+                child.kill('SIGKILL')
+                await execute(`${userName}`, `pkill -9 -u ${userName}`)
                 resolve(await execute(userName, exePath, option))
             }
         })
@@ -56,7 +62,10 @@ export function execute(
         if (option.timeout)
             timeHandler = setTimeout(async () => {
                 timeouted = true
-                await execute(`${userName}`, `pkill -u ${userName}`)
+                // @ts-ignore
+                child.stdin.pause()
+                child.kill('SIGKILL')
+                await execute(`${userName}`, `pkill -9 -u ${userName}`)
                 resolve({
                     resultType: ResultType.timeLimitExceeded,
                     code: -1,
