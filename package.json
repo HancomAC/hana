@@ -17,7 +17,7 @@
         "run": "node --es-module-specifier-resolution=node dist/index.js",
         "run:local": "yarn run build:ts && yarn run run",
         "run:docker": "yarn run build && docker run -p 80:80 -it jungol:HANA",
-        "dev": "tsc-watch --onSuccess \"node --es-module-specifier-resolution=node dist/index.js\"",
+        "dev": "tsc-watch --onSuccess \"yarn node --es-module-specifier-resolution=node dist/index.js\"",
         "prettier": "prettier --write .",
         "release": "standard-version"
     },
@@ -34,5 +34,6 @@
         "tsc": "^2.0.3",
         "tsc-watch": "^4.6.0",
         "typescript": "^4.5.4"
-    }
+    },
+    "packageManager": "yarn@3.1.1"
 }
