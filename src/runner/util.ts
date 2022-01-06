@@ -1,4 +1,4 @@
-import { execSync, spawn, ChildProcessWithoutNullStreams } from 'child_process'
+import { execSync, spawn } from 'child_process'
 import fs from 'fs'
 import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
@@ -17,23 +17,23 @@ export interface ExecuteResult {
 }
 
 async function abort(
-    process: ChildProcessWithoutNullStreams,
+    pid: number|undefined,
     userName: string
 ) {
+    if(!pid) return
     const { stdout } = await execute(
         `${userName}`,
-        'ps -o pid= --ppid ' + process.pid
+        'ps -o pid= --ppid ' + pid
     )
     const pids = stdout.split('\n').map((line) => parseInt(line.trim()))
-    for (const pid of pids) {
-        if (pid) {
+    for (const cpid of pids) {
+        if (cpid) {
             try {
-                await execute(`${userName}`, `pkill -9 -P ${pid}`)
+                await abort(cpid, userName)
             } catch (e) {}
         }
     }
-    await execute(`${userName}`, `pkill -P ${process.pid}`)
-    await execute(`${userName}`, `kill -2 -1`)
+    await execute(`${userName}`, `pkill -9 -P ${pid}`)
 }
 
 export function execute(
@@ -61,13 +61,13 @@ export function execute(
         child.unref()
         child.stdin.on('error', async () => {
             if (!timeouted) {
-                await abort(child, userName)
+                await abort(child.pid, userName)
                 resolve(await execute(userName, exePath, option))
             }
         })
         child.on('error', async () => {
             if (!timeouted) {
-                await abort(child, userName)
+                await abort(child.pid, userName)
                 resolve(await execute(userName, exePath, option))
             }
         })
@@ -81,7 +81,7 @@ export function execute(
         if (option.timeout)
             timeHandler = setTimeout(async () => {
                 timeouted = true
-                await abort(child, userName)
+                await abort(child.pid, userName)
                 resolve({
                     resultType: ResultType.timeLimitExceeded,
                     code: -1,
