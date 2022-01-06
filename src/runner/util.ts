@@ -16,15 +16,9 @@ export interface ExecuteResult {
     code: number
 }
 
-async function abort(
-    pid: number|undefined,
-    userName: string
-) {
-    if(!pid) return
-    const { stdout } = await execute(
-        `${userName}`,
-        'ps -o pid= --ppid ' + pid
-    )
+async function abort(pid: number | undefined, userName: string) {
+    if (!pid) return
+    const { stdout } = await execute(`${userName}`, 'ps -o pid= --ppid ' + pid)
     const pids = stdout.split('\n').map((line) => parseInt(line.trim()))
     for (const cpid of pids) {
         if (cpid) {
