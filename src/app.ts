@@ -66,5 +66,5 @@ app.use('*', function (req, res) {
 app.listen(80)
 
 process.on('uncaughtException', (e) => {
-    console.log("uncaughtException:", e);
+    console.log('uncaughtException:', e)
 })

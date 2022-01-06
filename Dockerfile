@@ -56,8 +56,9 @@ RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/run_konan /usr/bin/run_k
 # Copy files & Install requirements
 RUN addgroup execute
 WORKDIR /HANA
-COPY package.json yarn.lock /HANA/
-RUN yarn install --production
+COPY package.json yarn.lock .yarnrc.yml .versionrc .pnp.cjs .pnp.loader.mjs /HANA/
+COPY .yarn/ /HANA/.yarn/
+RUN yarn install
 COPY tsconfig.json /HANA/
 COPY res/ /HANA/res/
 COPY dist/ /HANA/dist/
