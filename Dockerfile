@@ -12,7 +12,7 @@ RUN yarn --version
 
 # Install Judgement Tool
 COPY include/ /include/
-RUN apk add cpulimit bash libc6-compat
+RUN apk add cpulimit bash libc6-compat procps
 RUN ln -s /lib/libc.musl-x86_64.so.1 /lib/ld-linux-x86-64.so.2
 
 # Install C/C++

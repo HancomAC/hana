@@ -1,4 +1,4 @@
-import { execSync, spawn } from 'child_process'
+import { execSync, spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import fs from 'fs'
 import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
@@ -14,6 +14,26 @@ export interface ExecuteResult {
     stdout: string
     stderr: string
     code: number
+}
+
+async function abort(
+    process: ChildProcessWithoutNullStreams,
+    userName: string
+) {
+    const { stdout } = await execute(
+        `${userName}`,
+        'ps -o pid= --ppid ' + process.pid
+    )
+    const pids = stdout.split('\n').map((line) => parseInt(line.trim()))
+    for (const pid of pids) {
+        if (pid) {
+            try {
+                await execute(`${userName}`, `pkill -9 -P ${pid}`)
+            } catch (e) {}
+        }
+    }
+    await execute(`${userName}`, `pkill -P ${process.pid}`)
+    await execute(`${userName}`, `kill -2 -1`)
 }
 
 export function execute(
@@ -36,24 +56,23 @@ export function execute(
         const child = spawn(`su`, [userName, '-c', exePath], {
             stdio: ['pipe', 'pipe', 'pipe'],
             ...(option.cwd ? { cwd: option.cwd } : {}),
+            detached: true,
         })
+        child.unref()
         child.stdin.on('error', async () => {
             if (!timeouted) {
-                // @ts-ignore
-                child.stdin.pause()
-                child.kill('SIGKILL')
-                await execute(`${userName}`, `pkill -9 -u ${userName}`)
+                await abort(child, userName)
                 resolve(await execute(userName, exePath, option))
             }
         })
         child.on('error', async () => {
             if (!timeouted) {
-                // @ts-ignore
-                child.stdin.pause()
-                child.kill('SIGKILL')
-                await execute(`${userName}`, `pkill -9 -u ${userName}`)
+                await abort(child, userName)
                 resolve(await execute(userName, exePath, option))
             }
+        })
+        child.on('exit', function () {
+            child.kill()
         })
 
         let timeHandler: NodeJS.Timeout,
@@ -62,10 +81,7 @@ export function execute(
         if (option.timeout)
             timeHandler = setTimeout(async () => {
                 timeouted = true
-                // @ts-ignore
-                child.stdin.pause()
-                child.kill('SIGKILL')
-                await execute(`${userName}`, `pkill -9 -u ${userName}`)
+                await abort(child, userName)
                 resolve({
                     resultType: ResultType.timeLimitExceeded,
                     code: -1,
