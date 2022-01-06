@@ -8,6 +8,12 @@ import { MultiJudgeCount } from './config'
 let wsObject = null as WebSocket | null
 let messageList = [] as string[]
 
+export function getMessageList() {
+    const ret = messageList
+    messageList = []
+    return ret
+}
+
 export function sendWS(message: string) {
     if (wsObject) {
         wsObject.send(message, (e) => {
