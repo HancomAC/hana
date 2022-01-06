@@ -26,11 +26,10 @@ app.post('/judge', (req, res) => {
             memoryLimit: req.body.memoryLimit,
             specialJudge: req.body.specialJudge,
         } as JudgeRequest
-        if(is<JudgeRequest>(problem)) {
+        if (is<JudgeRequest>(problem)) {
             requestJudge(problem)
             res.send({ success: true, uid: problem.uid })
-        }
-        else {
+        } else {
             res.status(400)
             res.send({ success: false })
         }
