@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid'
 import { init } from './socket'
 import { requestJudge } from './judge'
 import { JudgeRequest } from './types/request'
+import { is } from 'typescript-is'
 
 import bodyParser from 'body-parser'
 import favicon from 'serve-favicon'
@@ -25,8 +26,14 @@ app.post('/judge', (req, res) => {
             memoryLimit: req.body.memoryLimit,
             specialJudge: req.body.specialJudge,
         } as JudgeRequest
-        requestJudge(problem)
-        res.send({ success: true, uid: problem.uid })
+        if(is<JudgeRequest>(problem)) {
+            requestJudge(problem)
+            res.send({ success: true, uid: problem.uid })
+        }
+        else {
+            res.status(400)
+            res.send({ success: false })
+        }
     } catch (e) {
         res.status(400)
         res.send({ success: false })
