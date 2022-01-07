@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+    workflow_dispatch:
+    release:
+        types:
+            - created
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Use Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 16.x
+                  cache: 'npm'
+
+            - name: Update npm
+              run: npm install --global npm@latest
+
+            - name: Install Global Dependencies
+              run: npm install yarn typescript -g
+
+            - name: Install Dependencies
+              run: yarn install
+
+            - name: Build Docker Image
+              run: yarn run build
+
+            - name: Login to DockerHub
+              uses: docker/login-action@v1
+              with:
+                  username: hancomac
+                  password: ${{ secrets.DOCKERTOKEN }}
+
+            - name: Push Docker Image
+              run: docker image push hancomac/hana:lastest

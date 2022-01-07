@@ -5,10 +5,10 @@
     "scripts": {
         "build": "yarn run build:ts && yarn run build:docker",
         "build:ts": "ttsc",
-        "build:docker": "docker build -t jungol:HANA -- ./",
+        "build:docker": "docker build -t hancomac/hana:lastest -- ./",
         "run": "yarn node --es-module-specifier-resolution=node dist/index.js",
         "run:local": "yarn run build:ts && yarn run run",
-        "run:docker": "yarn run build && docker run -p 80:80 -it jungol:HANA",
+        "run:docker": "yarn run build && docker run -p 80:80 -it hancomac/hana:lastest",
         "prettier": "prettier --write .",
         "release": "standard-version"
     },
