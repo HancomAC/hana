@@ -230,7 +230,7 @@ interface responseOne {
 
 ##### Response Type
 
-###### JUDGE_PROGRESS
+* JUDGE_PROGRESS
 
 Message will be sent when judge is progressing.
 
@@ -246,7 +246,7 @@ interface responseFinish extends responseOne {
 
 progress is value between 0 and 1.
 
-###### JUDGE_FINISH
+* JUDGE_FINISH
 
 Message will be sent when judge is finished.
 
@@ -271,15 +271,15 @@ resultCode is a representing result of each subtask's reason.
 
 message is one sample stderr message when compile error or runtime error.
 
-###### JUDGE_INFO
+* JUDGE_INFO
 
 Message will be sent when user requests to get judge program's info.
 
-###### JUDGE_STATUS
+* JUDGE_STATUS
 
 Message will be sent when user requests to get judge status.
 
-###### JUDGE_ERROR
+* JUDGE_ERROR
 
 Message will be sent when judge encounters error.
 
