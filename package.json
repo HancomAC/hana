@@ -1,6 +1,6 @@
 {
     "name": "hana",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "license": "MIT",
     "scripts": {
         "build": "yarn run build:ts && yarn run build:docker",
