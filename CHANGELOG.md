@@ -4,22 +4,20 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.0.2](https://github.com/HancomAC/HANA/compare/v0.0.1...v0.0.2) (2022-01-08)
 
-
 ### Features
 
-* add http pull feature ([17abb15](https://github.com/HancomAC/HANA/commit/17abb1548f1755515e84ad692fcdcf254eb2128d))
-* add php support ([0ac32b0](https://github.com/HancomAC/HANA/commit/0ac32b09ba748f4714d17451ea81e1befb8c4879))
-* add ruby support ([c437724](https://github.com/HancomAC/HANA/commit/c4377244e4ef08148c9e22c8babde7687103620f))
-* make main process to not die ([961d11c](https://github.com/HancomAC/HANA/commit/961d11c820dddda8495d8dec20b6a9d4598ff27a))
-
+-   add http pull feature ([17abb15](https://github.com/HancomAC/HANA/commit/17abb1548f1755515e84ad692fcdcf254eb2128d))
+-   add php support ([0ac32b0](https://github.com/HancomAC/HANA/commit/0ac32b09ba748f4714d17451ea81e1befb8c4879))
+-   add ruby support ([c437724](https://github.com/HancomAC/HANA/commit/c4377244e4ef08148c9e22c8babde7687103620f))
+-   make main process to not die ([961d11c](https://github.com/HancomAC/HANA/commit/961d11c820dddda8495d8dec20b6a9d4598ff27a))
 
 ### Bug Fixes
 
-* assert type of request ([284c42e](https://github.com/HancomAC/HANA/commit/284c42edd3adf929873f88450716e5462be56154))
-* assert type of request ([0381b9d](https://github.com/HancomAC/HANA/commit/0381b9dbd99531db529f5bef893c3594d32e535b))
-* kill zombie process ([007a0c8](https://github.com/HancomAC/HANA/commit/007a0c83672e943e53a46ae50aaf595a73807e3c))
-* kill zombie process more recursively ([87480b4](https://github.com/HancomAC/HANA/commit/87480b495b06755269fb765f32f49499d35ea888))
-* ready for c# support ([b162675](https://github.com/HancomAC/HANA/commit/b162675a21587d48032e5d88308fb34c7c37f999))
+-   assert type of request ([284c42e](https://github.com/HancomAC/HANA/commit/284c42edd3adf929873f88450716e5462be56154))
+-   assert type of request ([0381b9d](https://github.com/HancomAC/HANA/commit/0381b9dbd99531db529f5bef893c3594d32e535b))
+-   kill zombie process ([007a0c8](https://github.com/HancomAC/HANA/commit/007a0c83672e943e53a46ae50aaf595a73807e3c))
+-   kill zombie process more recursively ([87480b4](https://github.com/HancomAC/HANA/commit/87480b495b06755269fb765f32f49499d35ea888))
+-   ready for c# support ([b162675](https://github.com/HancomAC/HANA/commit/b162675a21587d48032e5d88308fb34c7c37f999))
 
 ### 0.0.1 (2022-01-04)
 
