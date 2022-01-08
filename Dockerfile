@@ -61,6 +61,14 @@ RUN ruby --version
 RUN apk add php7
 RUN php --version
 
+# Install .NET
+RUN apk add bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
+RUN apk add libgdiplus --repository https://dl-3.alpinelinux.org/alpine/edge/testing/
+RUN wget https://dot.net/v1/dotnet-install.sh
+RUN bash /dotnet-install.sh -c Current
+RUN ln -s /root/.dotnet/dotnet /usr/local/bin/
+RUN dotnet --version
+
 # Copy files & Install requirements
 RUN addgroup execute
 WORKDIR /HANA

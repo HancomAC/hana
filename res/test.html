@@ -150,6 +150,7 @@
                 KOTLIN: 'kt',
                 RUBY: 'rb',
                 PHP: 'php',
+                CSHARP: 'cs',
             }
 
             const exampleCode = {
@@ -243,6 +244,19 @@ puts a.to_i + b.to_i`,
 fscanf(STDIN,"%d %d",$a,$b);
 fprintf(STDOUT,"%d",$a+$b);
 ?>`,
+                CSHARP: `using System;
+
+namespace HANA {
+    class Program {
+        static void Main() {
+            string s = Console.ReadLine();
+            string[] ss = s.Split();
+            int a = int.Parse(ss[0]);
+            int b = int.Parse(ss[1]);
+            Console.WriteLine(a+b);
+        }
+    }
+}`,
             }
 
             const ProblemDataSet = [

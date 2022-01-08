@@ -32,9 +32,10 @@ export const enum JudgeSourceType {
     TYPESCRIPT = 'TYPESCRIPT',
     GO = 'GO',
     RUST = 'RUST',
-    KOTLIN = 'KOTLIN',
+    KOTLIN = '__KOTLIN',
     RUBY = 'RUBY',
     PHP = 'PHP',
+    CSHARP = '__CSHARP',
 }
 
 export interface SourceFile {
