@@ -34,6 +34,7 @@ export const enum JudgeSourceType {
     RUST = 'RUST',
     KOTLIN = 'KOTLIN',
     RUBY = 'RUBY',
+    PHP = 'PHP',
 }
 
 export interface SourceFile {

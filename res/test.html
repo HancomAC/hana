@@ -149,6 +149,7 @@
                 TYPESCRIPT: 'ts',
                 KOTLIN: 'kt',
                 RUBY: 'rb',
+                PHP: 'php',
             }
 
             const exampleCode = {
@@ -238,6 +239,10 @@ console.log(a+b);`,
 }`,
                 RUBY: `a, b = gets.split
 puts a.to_i + b.to_i`,
+                PHP: `<?php
+fscanf(STDIN,"%d %d",$a,$b);
+fprintf(STDOUT,"%d",$a+$b);
+?>`,
             }
 
             const ProblemDataSet = [

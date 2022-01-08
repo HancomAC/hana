@@ -57,6 +57,10 @@ RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/run_konan /usr/bin/run_k
 RUN apk add ruby
 RUN ruby --version
 
+# Install PHP
+RUN apk add php7
+RUN php --version
+
 # Copy files & Install requirements
 RUN addgroup execute
 WORKDIR /HANA
