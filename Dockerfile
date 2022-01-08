@@ -46,12 +46,16 @@ ENV GOROOT /usr/lib/go
 ENV GOCACHE /tmp/gocache
 ENV PATH /go/bin:$PATH
 
-#Install Kotlin
+# Install Kotlin
 RUN wget https://github.com/JetBrains/kotlin/releases/download/v1.6.10/kotlin-native-linux-x86_64-1.6.10.tar.gz -O /tmp/kotlin.tar.gz
 RUN mkdir /kotlin
 RUN tar -xvzf /tmp/kotlin.tar.gz --directory /kotlin
 RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/kotlinc-native /usr/bin/kotlinc-native
 RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/run_konan /usr/bin/run_konan
+
+# Install Ruby
+RUN apk add ruby
+RUN ruby --version
 
 # Copy files & Install requirements
 RUN addgroup execute

@@ -165,7 +165,7 @@ export function executeJudge(
     return execute(
         `p-${data.uid}`,
         getLimitString(
-            { memoryLimit: data.memoryLimit, cpuLimit: 10 },
+            { memoryLimit: data.memoryLimit, cpuLimit: 100 },
             `/usr/bin/time -f "%E|%M" ${exePath}`
         ),
         { input, timeout: data.timeLimit || 0, cwd: getTmpPath(data.uid) }

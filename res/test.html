@@ -148,6 +148,7 @@
                 JAVASCRIPT: 'js',
                 TYPESCRIPT: 'ts',
                 KOTLIN: 'kt',
+                RUBY: 'rb',
             }
 
             const exampleCode = {
@@ -235,6 +236,8 @@ console.log(a+b);`,
     var b = nums[1].toInt()
     println(a+b)
 }`,
+                RUBY: `a, b = gets.split
+puts a.to_i + b.to_i`,
             }
 
             const ProblemDataSet = [
@@ -466,7 +469,7 @@ int main(int argc,char *args[])
                             },
                         ],
                         dataSet: ProblemDataSet,
-                        timeLimit: 2000,
+                        timeLimit: 20000,
                         memoryLimit: 1024,
                     }),
                 })

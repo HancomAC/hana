@@ -33,6 +33,7 @@ export const enum JudgeSourceType {
     GO = 'GO',
     RUST = 'RUST',
     KOTLIN = 'KOTLIN',
+    RUBY = 'RUBY',
 }
 
 export interface SourceFile {
