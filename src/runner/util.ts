@@ -2,6 +2,7 @@ import { execSync, spawn } from 'child_process'
 import fs from 'fs'
 import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
+import { getConfig } from '../config'
 
 export const enum ResultType {
     normal,
@@ -52,7 +53,6 @@ export function execute(
             ...(option.cwd ? { cwd: option.cwd } : {}),
             detached: true,
         })
-        child.unref()
         child.stdin.on('error', async () => {
             if (!timeouted) {
                 await abort(child.pid, userName)
@@ -165,7 +165,10 @@ export function executeJudge(
     return execute(
         `p-${data.uid}`,
         getLimitString(
-            { memoryLimit: data.memoryLimit, cpuLimit: 100 },
+            {
+                memoryLimit: data.memoryLimit,
+                cpuLimit: getConfig('RunCpuLimit'),
+            },
             `/usr/bin/time -f "%E|%M" ${exePath}`
         ),
         { input, timeout: data.timeLimit || 0, cwd: getTmpPath(data.uid) }

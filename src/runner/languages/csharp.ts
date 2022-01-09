@@ -1,5 +1,6 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
 import { execute, getLimitString, ResultType } from '../util'
+import { getConfig } from '../../config'
 
 export async function build(
     path: string,
@@ -9,7 +10,7 @@ export async function build(
     await execute(
         `p-${uid}`,
         getLimitString(
-            { cpuLimit: 50 },
+            { cpuLimit: getConfig('BuildCpuLimit') },
             `dotnet new console --force -o ${sourceName} && dotnet publish ${sourceName} --configuration Release --self-contained true --runtime linux-x64`
         ),
         { cwd: path }

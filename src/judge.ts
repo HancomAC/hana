@@ -1,6 +1,6 @@
 import { sendMessage } from './socket'
 import { WebSocketResponseType } from './types/response'
-import { MultiJudgeCount } from './config'
+import { getConfig } from './config'
 import { JudgeRequest } from './types/request'
 import executeJudge from './runner'
 import { JudgeResult } from './types/response'
@@ -15,7 +15,7 @@ function judgeFinishHandler(problem: string, result: JudgeResult) {
     if (problem) {
         sendMessage(WebSocketResponseType.JUDGE_FINISH, result)
     }
-    while (judgeList.length < MultiJudgeCount && waitList.length)
+    while (judgeList.length < getConfig('MultiJudgeCount') && waitList.length)
         judge(waitList.shift() as string)
 }
 
@@ -41,7 +41,7 @@ export function requestJudge(problem: JudgeRequest) {
         progress: 0,
         resultCode: 'PD',
     })
-    while (judgeList.length < MultiJudgeCount && waitList.length)
+    while (judgeList.length < getConfig('MultiJudgeCount') && waitList.length)
         judge(waitList.shift() as string)
 }
 

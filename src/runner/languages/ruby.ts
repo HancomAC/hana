@@ -1,5 +1,6 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
 import { execute, getLimitString, ResultType } from '../util'
+import { getConfig } from '../../config'
 
 export async function build(
     path: string,
@@ -8,7 +9,10 @@ export async function build(
 ) {
     await execute(
         `p-${uid}`,
-        getLimitString({ cpuLimit: 50 }, `ruby -c ${path}`),
+        getLimitString(
+            { cpuLimit: getConfig('BuildCpuLimit') },
+            `ruby -c ${path}`
+        ),
         { cwd: path }
     )
     return {

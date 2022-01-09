@@ -3,7 +3,7 @@ import expressWs from 'express-ws'
 import { WebSocketResponse, WebSocketResponseType } from './types/response'
 import { WebSocketRequest, WebSocketRequestType } from './types/request'
 import { getJudgeInfo } from './judge'
-import { MultiJudgeCount } from './config'
+import { getConfig } from './config'
 
 let wsObject = null as WebSocket | null
 let messageList = [] as string[]
@@ -45,8 +45,8 @@ export function sendError(reason: string) {
     sendWS(message)
 }
 
-export function init(app: expressWs.Application) {
-    app.ws('/', (ws, req) => {
+export function initWS(app: expressWs.Application) {
+    app.ws('/', (ws) => {
         if (wsObject) wsObject.close()
         wsObject = ws
         for (const message of messageList) {
@@ -65,7 +65,7 @@ export function init(app: expressWs.Application) {
                     case WebSocketRequestType.JUDGE_INFO:
                         sendMessage(WebSocketResponseType.JUDGE_INFO, {
                             version: '1.0.0',
-                            multiJudgeCount: MultiJudgeCount,
+                            multiJudgeCount: getConfig('MultiJudgeCount'),
                         })
                         break
                     case WebSocketRequestType.JUDGE_STATUS:
