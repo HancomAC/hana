@@ -51,6 +51,7 @@ RUN mkdir /kotlin
 RUN tar -xvzf /tmp/kotlin.tar.gz --directory /kotlin
 RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/kotlinc-native /usr/bin/kotlinc-native
 RUN ln -s /kotlin/kotlin-native-linux-x86_64-1.6.10/bin/run_konan /usr/bin/run_konan
+RUN rm /tmp/kotlin.tar.gz
 
 # Install Ruby
 RUN apk add ruby
@@ -67,3 +68,10 @@ RUN wget https://dot.net/v1/dotnet-install.sh
 RUN bash /dotnet-install.sh -c Current
 RUN ln -s /root/.dotnet/dotnet /usr/local/bin/
 RUN dotnet --version
+
+# Cleanup
+RUN rm -rf /var/cache/apk/*
+RUN rm -rf /root/.cache/yarn
+RUN rm -rf /root/.cache/npm
+RUN rm -rf /root/.cache/pip
+RUN rm -rf /tmp
