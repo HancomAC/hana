@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/HancomAC/HANA/compare/v0.0.2...v0.0.3) (2022-01-09)
+
+### Features
+
+-   automatically set config based on system performance ([23c6f76](https://github.com/HancomAC/HANA/commit/23c6f76ff4501fb4984e250fbcf9a7d4782a42e6))
+
+### Bug Fixes
+
+-   accept big input ([cf2beef](https://github.com/HancomAC/HANA/commit/cf2beefe400eb758ade27249c22632ef16b7308e))
+-   fixed bug that not judging without SPJ ([9dd9677](https://github.com/HancomAC/HANA/commit/9dd9677fb5d469e03f97001522fbc14671e4487b))
+-   ready for c# support ([5edefcb](https://github.com/HancomAC/HANA/commit/5edefcb7c4990e239dd7a91099a5b2c589871ea7))
+-   reduce image size ([e9df2ec](https://github.com/HancomAC/HANA/commit/e9df2ecc94a676bfe87c8f72d89e3e29c26e11ef))
+
 ### [0.0.2](https://github.com/HancomAC/HANA/compare/v0.0.1...v0.0.2) (2022-01-08)
 
 ### Features
