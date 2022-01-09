@@ -83,8 +83,10 @@ export interface JudgeRequest<
     judgeType: TJudgeType
     source: SourceFile[]
     dataSet: TSubTask[]
-    specialJudge?: {
-        language: JudgeSourceType
-        source: string
-    }
+    specialJudge?:
+        | {
+              language: JudgeSourceType
+              source: string
+          }
+        | undefined
 }

@@ -18,9 +18,11 @@ const PORT = 80
 
 const app = expressWs(express()).app
 init(app)
-app.use(bodyParser.json({
-    limit : "100mb"
-}))
+app.use(
+    bodyParser.json({
+        limit: '100mb',
+    })
+)
 
 app.post('/judge', (req, res) => {
     try {
@@ -42,6 +44,7 @@ app.post('/judge', (req, res) => {
             res.send({ success: false })
         }
     } catch (e) {
+        console.log(e)
         res.status(400)
         res.send({ success: false })
     }
