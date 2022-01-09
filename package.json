@@ -5,12 +5,15 @@
     "scripts": {
         "build": "yarn run build:ts && yarn run build:docker",
         "build:ts": "ttsc",
-        "build:docker": "docker build -t hancomac/hana:lastest -- ./",
+        "build:base": "docker build -t hancomac/hana:base -f Dockerfile/base.Dockerfile -- ./",
+        "build:docker": "docker build -t hancomac/hana:lastest -f Dockerfile/main.Dockerfile -- ./",
         "run": "yarn node --es-module-specifier-resolution=node dist/index.js",
         "run:local": "yarn run build:ts && yarn run run",
         "run:docker": "yarn run build && docker run -p 80:80 -it hancomac/hana:lastest",
         "prettier": "prettier --write .",
-        "release": "standard-version && yarn run prettier"
+        "release": "standard-version && yarn run prettier",
+        "deploy:base": "docker push hancomac/hana:base",
+        "deploy:lastest": "docker push hancomac/hana:lastest"
     },
     "dependencies": {
         "body-parser": "^1.19.1",

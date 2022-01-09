@@ -1,5 +1,4 @@
 FROM alpine:latest
-EXPOSE 80
 
 RUN apk update
 
@@ -68,14 +67,3 @@ RUN wget https://dot.net/v1/dotnet-install.sh
 RUN bash /dotnet-install.sh -c Current
 RUN ln -s /root/.dotnet/dotnet /usr/local/bin/
 RUN dotnet --version
-
-# Copy files & Install requirements
-RUN addgroup execute
-WORKDIR /HANA
-COPY package.json yarn.lock .yarnrc.yml .versionrc .pnp.cjs .pnp.loader.mjs /HANA/
-COPY .yarn/ /HANA/.yarn/
-RUN yarn install
-COPY tsconfig.json /HANA/
-COPY res/ /HANA/res/
-COPY dist/ /HANA/dist/
-CMD yarn run run
