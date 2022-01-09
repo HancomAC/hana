@@ -18,7 +18,9 @@ const PORT = 80
 
 const app = expressWs(express()).app
 init(app)
-app.use(bodyParser.json())
+app.use(bodyParser.json({
+    limit : "100mb"
+}))
 
 app.post('/judge', (req, res) => {
     try {
