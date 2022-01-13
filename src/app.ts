@@ -7,7 +7,6 @@ import bodyParser from 'koa-bodyparser'
 import { v4 as uuid } from 'uuid'
 import { is } from 'typescript-is'
 import * as os from 'os'
-import * as path from 'path'
 
 import { getMessageList, initWS } from './socket'
 import { requestJudge } from './judge'
