@@ -36,6 +36,7 @@ export const enum JudgeSourceType {
     RUBY = 'RUBY',
     PHP = 'PHP',
     CSHARP = '__CSHARP',
+    LUA = 'LUA',
 }
 
 export interface SourceFile {

@@ -69,6 +69,11 @@ RUN bash /dotnet-install.sh -c Current
 RUN ln -s /root/.dotnet/dotnet /usr/local/bin/
 RUN dotnet --version
 
+# Install Lua
+RUN apk add lua5.3
+RUN luac5.3 -v
+RUN lua5.3 -v
+
 # Cleanup
 RUN rm -rf /var/cache/apk/*
 RUN rm -rf /root/.cache/yarn

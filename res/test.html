@@ -82,7 +82,8 @@
                 background-color: #f7e9e9;
             }
             .card.RE,
-            .card.CE {
+            .card.CE,
+            .card.TLE {
                 background-color: #fcffe6;
             }
 
@@ -151,6 +152,7 @@
                 RUBY: 'rb',
                 PHP: 'php',
                 CSHARP: 'cs',
+                LUA: 'lua',
             }
 
             const exampleCode = {
@@ -257,6 +259,8 @@ namespace HANA {
         }
     }
 }`,
+                LUA: `a,b = io.read("*number", "*number")
+print(a+b)`,
             }
 
             const ProblemDataSet = [
