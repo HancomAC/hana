@@ -1,9 +1,9 @@
 import { WebSocket } from 'ws'
-import expressWs from 'express-ws'
 import { WebSocketResponse, WebSocketResponseType } from './types/response'
 import { WebSocketRequest, WebSocketRequestType } from './types/request'
 import { getJudgeInfo } from './judge'
 import { getConfig } from './config'
+import type KoaWebsocket from 'koa-websocket'
 
 let wsObject = null as WebSocket | null
 let messageList = [] as string[]
@@ -45,16 +45,16 @@ export function sendError(reason: string) {
     sendWS(message)
 }
 
-export function initWS(app: expressWs.Application) {
-    app.ws('/', (ws) => {
+export function initWS(app: KoaWebsocket.App) {
+    app.ws.use((ctx) => {
         if (wsObject) wsObject.close()
-        wsObject = ws
+        wsObject = ctx.websocket
         for (const message of messageList) {
             wsObject.send(message)
         }
         messageList = []
         sendMessage(WebSocketResponseType.JUDGE_STATUS, getJudgeInfo())
-        ws.on('message', function (msg) {
+        wsObject.on('message', (msg) => {
             try {
                 const message = JSON.parse(msg.toString()) as WebSocketRequest
                 if (!message.type) {
@@ -82,7 +82,7 @@ export function initWS(app: expressWs.Application) {
                 sendError('JSON Parse Error')
             }
         })
-        ws.on('disconnect', function () {
+        wsObject.on('disconnect', function () {
             wsObject = null
         })
     })

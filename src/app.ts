@@ -1,15 +1,17 @@
-import express from 'express'
-import expressWs from 'express-ws'
+import koa from 'koa'
+import Router from 'koa-router'
+import webSockify from 'koa-websocket'
+import send from 'koa-send'
+import bodyParser from 'koa-bodyparser'
+
 import { v4 as uuid } from 'uuid'
+import { is } from 'typescript-is'
+import * as os from 'os'
+import * as path from 'path'
+
 import { getMessageList, initWS } from './socket'
 import { requestJudge } from './judge'
 import { JudgeRequest } from './types/request'
-import { is } from 'typescript-is'
-import * as os from 'os'
-
-import bodyParser from 'body-parser'
-import favicon from 'serve-favicon'
-import path from 'path'
 import { LanguageModule, loadLanguage } from './runner/loader'
 import { clearTempEnv, executeJudge, initTempEnv } from './runner/util'
 import * as console from 'console'
@@ -20,6 +22,7 @@ process.on('uncaughtException', (e) => {
 })
 
 const PORT = 80
+const originalRestriction = 1700000000
 
 async function init() {
     console.log('Preloading languages...')
@@ -37,7 +40,7 @@ async function init() {
                 source: `#include<iostream>
                 int main() {
                     int i, j, sum = 0;
-                    for (j = 0; j < 10; j++) for (i = 0; i < 1700000000; i++)
+                    for (j = 0; j < 10; j++) for (i = 0; i < ${originalRestriction}; i++)
                         sum += i;
                     std::cout << sum;
                     return 0;
@@ -69,18 +72,7 @@ async function init() {
 
     console.log(`CPU Restriction set to ${getConfig('RunCpuLimit')}%.`)
 
-    setConfig(
-        'MultiJudgeCount',
-        os.cpus().length *
-            Math.floor(
-                100 /
-                    Math.max(
-                        getConfig('RunCpuLimit'),
-                        getConfig('BuildCpuLimit')
-                    )
-            ) -
-            2
-    )
+    setConfig('MultiJudgeCount', os.cpus().length - 2)
 
     console.log(
         `Parallel judgement count set to ${getConfig('MultiJudgeCount')}.`
@@ -90,84 +82,81 @@ async function init() {
 
     clearTempEnv(uid)
 
-    const app = expressWs(express()).app
-
-    initWS(app)
+    const app = webSockify(new koa())
+    const router = new Router()
 
     app.use(
-        bodyParser.json({
-            limit: '100mb',
+        bodyParser({
+            jsonLimit: '10mb',
         })
     )
 
-    app.post('/judge', (req, res) => {
+    initWS(app)
+
+    router.post('/judge', (ctx) => {
         try {
             const problem = {
                 uid: uuid(),
-                language: req.body.language,
-                judgeType: req.body.judgeType,
-                source: req.body.source,
-                dataSet: req.body.dataSet,
-                timeLimit: req.body.timeLimit,
-                memoryLimit: req.body.memoryLimit,
-                specialJudge: req.body.specialJudge,
+                language: ctx.request.body.language,
+                judgeType: ctx.request.body.judgeType,
+                source: ctx.request.body.source,
+                dataSet: ctx.request.body.dataSet,
+                timeLimit: ctx.request.body.timeLimit,
+                memoryLimit: ctx.request.body.memoryLimit,
+                specialJudge: ctx.request.body.specialJudge,
             } as JudgeRequest
             if (is<JudgeRequest>(problem)) {
                 requestJudge(problem)
-                res.send({ success: true, uid: problem.uid })
+                ctx.body = { success: true, uid: problem.uid }
             } else {
-                res.status(400)
-                res.send({ success: false })
+                ctx.status = 400
+                ctx.body = { success: false }
             }
         } catch (e) {
             console.log(e)
-            res.status(400)
-            res.send({ success: false })
+            ctx.status = 400
+            ctx.body = { success: false }
         }
     })
 
-    app.get('/poll', (req, res) => {
-        res.set('Cache-Control', 'no-store')
-        res.send({ success: true, data: getMessageList() })
-    })
+    router
+        .get('/poll', (ctx) => {
+            ctx.set('Cache-Control', 'no-store')
+            ctx.body = { success: true, data: getMessageList() }
+        })
+        .get('/config', (ctx) => {
+            ctx.body = { success: true, data: getAllConfig() }
+        })
+        .get('/test', async (ctx) => {
+            await send(ctx, 'res/test.html')
+        })
+        .get('/res/logo', async (ctx) => {
+            await send(ctx, 'res/logo.png')
+        })
+        .get('/res/github', async (ctx) => {
+            await send(ctx, 'res/github.png')
+        })
+        .get('/res/docs', async (ctx) => {
+            await send(ctx, 'res/docs.png')
+        })
+        .get('/res/test', async (ctx) => {
+            await send(ctx, 'res/test.png')
+        })
+        .get('favicon.ico', async (ctx) => {
+            await send(ctx, 'res/logo.ico')
+        })
+        .get('/', async (ctx) => {
+            await send(ctx, 'res/index.html')
+        })
+        .use((ctx) => {
+            ctx.redirect('http://jungol.co.kr')
+        })
 
-    app.get('/config', (req, res) => {
-        res.send({ success: true, data: getAllConfig() })
-    })
+    app.use(router.routes()).use(router.allowedMethods())
 
-    app.get('/test', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'test.html'))
-    })
+    await app.listen(PORT)
 
-    app.get('/res/logo', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'logo.png'))
-    })
-
-    app.get('/res/github', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'github.png'))
-    })
-
-    app.get('/res/docs', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'docs.png'))
-    })
-
-    app.get('/res/test', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'test.png'))
-    })
-
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'res', 'index.html'))
-    })
-
-    app.use(favicon(__dirname + '/../res/logo.ico'))
-
-    app.use('*', (req, res) => {
-        res.redirect('http://jungol.co.kr')
-    })
-
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}.`)
-    })
+    console.log(`Server is running on port ${PORT}.`)
 }
 
 init().catch((e) => {
