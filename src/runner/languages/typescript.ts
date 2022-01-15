@@ -1,5 +1,5 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
+import { execute, getLimitString, getUserName } from '../util'
 import { getConfig } from '../../config'
 
 export async function build(
@@ -8,7 +8,7 @@ export async function build(
     sourceName: string = 'Main'
 ) {
     const res = await execute(
-        `p-${uid}`,
+        getUserName(uid),
         getLimitString(
             { cpuLimit: getConfig('BuildCpuLimit') },
             `cp -a /include/TYPESCRIPT/. ${path}/;tsc ${sourceName}.${getExtension()}`

@@ -49,7 +49,7 @@ async function init() {
 
     console.log('Building test program...')
 
-    await cpp.build(tempEnv, uid)
+    console.log(await cpp.build(tempEnv, uid))
 
     console.log('Calculating time...')
 

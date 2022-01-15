@@ -66,7 +66,7 @@ export default function commonJudge(
                     memory: Array(data.dataSet.length).fill(0),
                     message: buildResult.stderr
                         .replaceAll(getTmpPath(data.uid), '~')
-                        .replaceAll(`/p-${data.uid}`, ''),
+                        .replaceAll(`/p_${data.uid}`, ''),
                 })
                 return
             }

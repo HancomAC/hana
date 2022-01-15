@@ -7,7 +7,7 @@
         "build:all": "yarn run build:ts && yarn run build:docker:all",
         "build:ts": "ttsc",
         "build:docker": "docker build -t hancomac/hana:lastest -f Dockerfile/main.Dockerfile -- ./",
-        "build:docker:base": "docker build -t hancomac/hana:base -f Dockerfile/base.Dockerfile -- ./",
+        "build:docker:base": "docker build --progress plain -t hancomac/hana:base -f Dockerfile/base.Dockerfile -- ./",
         "build:docker:all": "yarn run build:docker:base && yarn run build:docker",
         "run": "yarn node --es-module-specifier-resolution=node dist/index.js",
         "run:local": "yarn run build:ts && yarn run run",
@@ -19,6 +19,7 @@
         "deploy:lastest": "docker push hancomac/hana:lastest"
     },
     "dependencies": {
+        "hi-base32": "^0.5.1",
         "koa": "^2.13.4",
         "koa-bodyparser": "^4.3.0",
         "koa-router": "^10.1.1",

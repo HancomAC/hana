@@ -1,10 +1,10 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
+import { execute, getLimitString, getUserName } from '../util'
 import { getConfig } from '../../config'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
     return execute(
-        `p-${uid}`,
+        getUserName(uid),
         getLimitString(
             { cpuLimit: getConfig('BuildCpuLimit') },
             `gcc ${sourceName}.${getExtension()} -o ${sourceName} -O2 -Wall -lm --static -std=c99 -DONLINE_JUDGE`

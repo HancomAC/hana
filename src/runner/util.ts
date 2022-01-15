@@ -3,6 +3,7 @@ import fs from 'fs'
 import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
 import { getConfig } from '../config'
+import base32 from 'hi-base32'
 
 export const enum ResultType {
     normal,
@@ -48,7 +49,8 @@ export function execute(
             })
             return
         }
-        const child = spawn(`su`, [userName, '-c', exePath], {
+        console.log(`su`, '-m', userName, '-c', `'${exePath}'`)
+        const child = spawn(`su`, ['-m', userName, '-c', `${exePath}`], {
             stdio: ['pipe', 'pipe', 'pipe'],
             ...(option.cwd ? { cwd: option.cwd } : {}),
             detached: true,
@@ -130,13 +132,15 @@ export function getTmpPath(uid: string) {
 export function initTempEnv(uid: string, sources: SourceFile[]) {
     const tmpPath = getTmpPath(uid)
     execSync(
-        `adduser -g execute --disabled-password --no-create-home p-${uid}`,
+        `adduser --ingroup execute --disabled-password --no-create-home ${getUserName(
+            uid
+        )}`,
         {
             stdio: 'ignore',
         }
     )
     fs.mkdirSync(tmpPath, { recursive: true })
-    execSync(`chown p-${uid} ${tmpPath}`, { stdio: 'ignore' })
+    execSync(`chown ${getUserName(uid)} ${tmpPath}`, { stdio: 'ignore' })
 
     for (const i of sources) fs.writeFileSync(tmpPath + '/' + i.name, i.source)
     return tmpPath
@@ -145,7 +149,17 @@ export function initTempEnv(uid: string, sources: SourceFile[]) {
 export function clearTempEnv(uid: string) {
     const tmpPath = getTmpPath(uid)
     fs.rmSync(tmpPath, { recursive: true })
-    execSync(`deluser p-${uid}`, { stdio: 'ignore' })
+    execSync(`deluser ${getUserName(uid)}`, { stdio: 'ignore' })
+}
+
+export function getUserName(uid: string) {
+    return (
+        'p_' +
+        base32
+            .encode(Buffer.from(uid.replaceAll('-', ''), 'hex'))
+            .replaceAll('=', '')
+            .toLowerCase()
+    )
 }
 
 export function getLimitString(
@@ -154,7 +168,9 @@ export function getLimitString(
 ) {
     return `${
         limit.memoryLimit ? `ulimit -v ${limit.memoryLimit * 1024};` : ''
-    }${limit.cpuLimit ? `cpulimit -i -l ${limit.cpuLimit} -- ` : ''}${command}`
+    }${
+        limit.cpuLimit ? `cpulimit -m -f -q -l ${limit.cpuLimit} -- ` : ''
+    }${command}`
 }
 
 export function executeJudge(
@@ -163,13 +179,13 @@ export function executeJudge(
     input: string
 ) {
     return execute(
-        `p-${data.uid}`,
+        getUserName(data.uid),
         getLimitString(
             {
                 memoryLimit: data.memoryLimit,
                 cpuLimit: getConfig('RunCpuLimit'),
             },
-            `/usr/bin/time -f "%E|%M" ${exePath}`
+            `time -f '%E|%M' ${exePath}`
         ),
         { input, timeout: data.timeLimit || 0, cwd: getTmpPath(data.uid) }
     )
