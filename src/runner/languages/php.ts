@@ -1,16 +1,7 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
-    return execute(
-        `p-${uid}`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `php -l ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
+    return `php -l ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

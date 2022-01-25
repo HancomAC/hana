@@ -1484,6 +1484,7 @@ __metadata:
     "@types/koa-websocket": ^5.0.7
     "@types/uuid": ^8.3.4
     "@types/ws": ^8.2.2
+    hi-base32: ^0.5.1
     husky: ^7.0.4
     koa: ^2.13.4
     koa-bodyparser: ^4.3.0
@@ -1560,6 +1561,13 @@ __metadata:
   dependencies:
     function-bind: ^1.1.1
   checksum: b9ad53d53be4af90ce5d1c38331e712522417d017d5ef1ebd0507e07c2fbad8686fffb8e12ddecd4c39ca9b9b47431afbb975b8abf7f3c3b82c98e9aad052792
+  languageName: node
+  linkType: hard
+
+"hi-base32@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "hi-base32@npm:0.5.1"
+  checksum: 6655682b5796d75ed3068071e61d05a490e2086c4908af3b94a730059147b8a4a5e8870e656b828d0550dcc9988d8748bda54a53e428cbce28e0d7a785b2ffde
   languageName: node
   linkType: hard
 

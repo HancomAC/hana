@@ -1,14 +1,15 @@
 import { JudgeSourceType } from '../types/request'
 import { loadLanguage } from './loader'
 import {
-    clearTempEnv,
-    executeJudge,
-    getTmpPath,
+    clearTempEnv, execute,
+    executeJudge, getLimitString,
+    getTmpPath, getUserName,
     initTempEnv,
     tryIt,
 } from './util'
 import fs from 'fs'
 import { v4 as uuid } from 'uuid'
+import {getConfig} from "../config";
 
 const specialJudgeSource = 'Main',
     specialJudgeIn = '_special_judge__HANA__INPUT',
@@ -34,11 +35,11 @@ export async function initSpecialJudge(
     )
 
     if (languageModule.build) {
-        const buildResult = await languageModule.build(
-            tmpPath,
-            uid,
-            specialJudgeSource
-        )
+
+        const buildResult = await execute(getUserName(uid), getLimitString({
+            cpuLimit: getConfig('BuildCpuLimit')
+        }, languageModule.build(tmpPath, uid, 'Main')), {cwd: tmpPath})
+
         if (buildResult.code) return ''
     }
 

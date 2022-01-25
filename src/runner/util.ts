@@ -3,6 +3,7 @@ import fs from 'fs'
 import { ExecuteRequest, SourceFile } from '../types/request'
 import { JudgeResultCode } from '../types/response'
 import { getConfig } from '../config'
+import base32 from 'hi-base32'
 
 export const enum ResultType {
     normal,
@@ -37,6 +38,7 @@ export function execute(
     option: { input?: string; timeout?: number; cwd?: string } = {},
     recursive = 0
 ) {
+    console.log(exePath)
     option = Object.assign({ input: '', timeout: 0, cwd: '' }, option)
     return new Promise<ExecuteResult>(async (resolve) => {
         if (recursive > 3) {
@@ -130,13 +132,13 @@ export function getTmpPath(uid: string) {
 export function initTempEnv(uid: string, sources: SourceFile[]) {
     const tmpPath = getTmpPath(uid)
     execSync(
-        `adduser -g execute --disabled-password --no-create-home p-${uid}`,
+        `adduser -g execute --disabled-password --no-create-home ${getUserName(uid)}`,
         {
             stdio: 'ignore',
         }
     )
     fs.mkdirSync(tmpPath, { recursive: true })
-    execSync(`chown p-${uid} ${tmpPath}`, { stdio: 'ignore' })
+    execSync(`chown ${getUserName(uid)} ${tmpPath}`, { stdio: 'ignore' })
 
     for (const i of sources) fs.writeFileSync(tmpPath + '/' + i.name, i.source)
     return tmpPath
@@ -145,7 +147,7 @@ export function initTempEnv(uid: string, sources: SourceFile[]) {
 export function clearTempEnv(uid: string) {
     const tmpPath = getTmpPath(uid)
     fs.rmSync(tmpPath, { recursive: true })
-    execSync(`deluser p-${uid}`, { stdio: 'ignore' })
+    execSync(`deluser ${getUserName(uid)}`, { stdio: 'ignore' })
 }
 
 export function getLimitString(
@@ -163,7 +165,7 @@ export function executeJudge(
     input: string
 ) {
     return execute(
-        `p-${data.uid}`,
+        getUserName(data.uid),
         getLimitString(
             {
                 memoryLimit: data.memoryLimit,
@@ -188,4 +190,14 @@ export function tryIt(command: any) {
     try {
         command()
     } catch (e) {}
+}
+
+export function getUserName(uid: string) {
+    return (
+        'p_' +
+        base32
+            .encode(Buffer.from(uid.replaceAll('-', ''), 'hex'))
+            .replaceAll('=', '')
+            .toLowerCase()
+    )
 }

@@ -1,16 +1,7 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
-    return execute(
-        `root`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `ls;kotlinc-native -o ${sourceName} -opt ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
+    return `ls;kotlinc-native -o ${sourceName} -opt ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

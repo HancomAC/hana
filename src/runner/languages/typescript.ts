@@ -1,26 +1,12 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
+import { execute } from '../util'
 
-export async function build(
+export function build(
     path: string,
     uid: string,
     sourceName: string = 'Main'
 ) {
-    const res = await execute(
-        `p-${uid}`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `cp -a /include/TYPESCRIPT/. ${path}/;tsc ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
-    return {
-        resultType: res.resultType,
-        code: res.code,
-        stdout: '',
-        stderr: res.stdout + '\n' + res.stderr,
-    }
+    return `cp -a /include/TYPESCRIPT/. ${path}/;tsc ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

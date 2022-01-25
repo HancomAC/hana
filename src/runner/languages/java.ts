@@ -1,16 +1,7 @@
-import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
+import {JudgeSourceType, JudgeType} from '../../types/request'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
-    return execute(
-        `p-${uid}`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
+    return `javac --release 11 -J-Xms1024m -J-Xmx1920m -J-Xss512m -encoding UTF-8 ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

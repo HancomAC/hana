@@ -1,5 +1,5 @@
-import { JudgeRequest, JudgeType, ScoringType } from '../types/request'
-import { sendMessage } from '../socket'
+import {JudgeRequest, JudgeType, ScoringType} from '../types/request'
+import {sendMessage} from '../socket'
 import {
     JudgeResult,
     JudgeResultCode,
@@ -8,18 +8,20 @@ import {
 import {
     clearTempEnv,
     executeJudge,
+    execute,
     ExecuteResult,
     getTmpPath,
     initTempEnv,
     isSame,
     representativeResult,
-    ResultType,
+    ResultType, getUserName, getLimitString,
 } from './util'
-import { initSpecialJudge, clearSpecialJudge, runSpecialJudge } from './special'
+import {initSpecialJudge, clearSpecialJudge, runSpecialJudge} from './special'
+import {getConfig} from "../config";
 
 export default function commonJudge(
     data: JudgeRequest,
-    build: ((path: string, uid: string) => Promise<ExecuteResult>) | null,
+    build: ((path: string, uid: string, sourceName: string) => string) | null,
     getExecuteCommand: (path: string, uid: string) => string
 ) {
     return new Promise<JudgeResult>(async (resolve) => {
@@ -46,7 +48,9 @@ export default function commonJudge(
         )
 
         if (build) {
-            const buildResult = await build(tmpPath, data.uid)
+            const buildResult = await execute(getUserName(data.uid), getLimitString({
+                cpuLimit: getConfig('BuildCpuLimit')
+            }, build(tmpPath, data.uid, 'Main')), {cwd: tmpPath})
 
             if (buildResult.code) {
                 clearTempEnv(data.uid)
@@ -66,7 +70,7 @@ export default function commonJudge(
                     memory: Array(data.dataSet.length).fill(0),
                     message: buildResult.stderr
                         .replaceAll(getTmpPath(data.uid), '~')
-                        .replaceAll(`/p-${data.uid}`, ''),
+                        .replaceAll(`/${getUserName(data.uid)}`, ''),
                 })
                 return
             }
@@ -113,7 +117,7 @@ export default function commonJudge(
                 subtaskMaxTimeUsage = 0
 
             for (const i in subtask.data) {
-                const { code, stdout, stderr, resultType } = await executeJudge(
+                const {code, stdout, stderr, resultType} = await executeJudge(
                     data,
                     getExecuteCommand(tmpPath, data.uid),
                     subtask.data[i].input
@@ -147,7 +151,8 @@ export default function commonJudge(
                     try {
                         timeUsage =
                             parseFloat(info.split('m ')[1].split('s')[0]) * 1000
-                    } catch {}
+                    } catch {
+                    }
                     const memUsage = parseInt(info.split('|')[1])
                     subtaskMaxTimeUsage = Math.max(
                         subtaskMaxTimeUsage,

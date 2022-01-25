@@ -13,7 +13,7 @@ export interface LanguageModule {
         path: string,
         uid: string,
         sourceName?: string
-    ) => Promise<ExecuteResult>
+    ) => string
     getExecuteCommand: (
         path: string,
         uid: string,

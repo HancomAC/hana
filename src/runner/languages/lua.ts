@@ -1,16 +1,7 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
-    return execute(
-        `p-${uid}`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `luac5.3 -p ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
+    return `luac5.3 -p ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

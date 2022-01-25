@@ -19,7 +19,7 @@ export default async function (data: JudgeRequest): Promise<JudgeResult> {
                     languageModule.build as (
                         path: string,
                         uid: string
-                    ) => Promise<ExecuteResult>,
+                    ) => string,
                     languageModule.getExecuteCommand as (
                         path: string,
                         uid: string

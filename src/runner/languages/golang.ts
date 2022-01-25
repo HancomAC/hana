@@ -1,16 +1,7 @@
 import { JudgeSourceType, JudgeType } from '../../types/request'
-import { execute, getLimitString } from '../util'
-import { getConfig } from '../../config'
 
 export function build(path: string, uid: string, sourceName: string = 'Main') {
-    return execute(
-        `p-${uid}`,
-        getLimitString(
-            { cpuLimit: getConfig('BuildCpuLimit') },
-            `go build ${sourceName}.${getExtension()}`
-        ),
-        { cwd: path }
-    )
+    return `go build ${sourceName}.${getExtension()}`
 }
 
 export function getExecuteCommand(

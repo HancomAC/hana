@@ -1,7 +1,7 @@
 const config = {
     MultiJudgeCount: 1,
-    BuildCpuLimit: 50,
-    RunCpuLimit: 100,
+    RunCpuLimit: 98,
+    BuildCpuLimit: 98
 } as any
 
 type Config = 'MultiJudgeCount' | 'BuildCpuLimit' | 'RunCpuLimit'
